@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FRESH PICK - Fresh Vegetables & Groceries</title>
+    <title>FRESH PICK - Fresh Fruits & Vegetables</title>
     <style>
         :root {
-            --primary: #2e7d32;
+            --primary: #2b7818;
+            --primary-light: #43a047;
+            --bg-light: #e8f5e9;
+            --card-bg: #e2f3e0;
             --accent: #ff9800;
-            --bg: #f4f6f8;
+            --dark-text: #1b4332;
         }
 
         * {
@@ -19,127 +22,220 @@
         }
 
         body {
-            background-color: var(--bg);
-            padding-bottom: 50px;
+            background-color: #f6fbf6;
+            color: #333;
         }
 
+        /* Header */
         header {
-            background-color: var(--primary);
-            color: white;
-            padding: 15px 20px;
+            background-color: #ffffff;
+            padding: 15px 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         .logo {
             font-size: 24px;
             font-weight: bold;
+            color: var(--primary);
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .user-stats {
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        .user-panel {
             display: flex;
             gap: 15px;
             align-items: center;
         }
 
-        .stat-box {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 6px 12px;
+        .points-badge {
+            background: var(--bg-light);
+            color: var(--primary);
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid var(--primary-light);
         }
 
         .cart-btn {
-            background: var(--accent);
-            border: none;
+            background: var(--primary);
             color: white;
-            padding: 8px 16px;
+            border: none;
+            padding: 8px 18px;
             border-radius: 20px;
             font-weight: bold;
             cursor: pointer;
         }
 
-        .hero-banner {
-            background: linear-gradient(135deg, #a8e063, #56ab2f);
+        /* Hero Banner Section (Like Image Design) */
+        .hero {
+            background: linear-gradient(135deg, #74c653, #2b7818);
             color: white;
-            padding: 30px 20px;
-            text-align: center;
-            margin-bottom: 20px;
+            padding: 40px 5%;
+            border-radius: 0 0 30px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
         }
 
-        .hero-banner h1 {
-            font-size: 28px;
-            margin-bottom: 8px;
+        .hero-text {
+            max-width: 500px;
+        }
+
+        .hero-text h1 {
+            font-size: 42px;
+            line-height: 1.2;
+            margin-bottom: 15px;
+        }
+
+        .hero-text p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .shop-btn {
+            background: white;
+            color: var(--primary);
+            padding: 10px 25px;
+            border-radius: 25px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .hero-img img {
+            max-width: 380px;
+            width: 100%;
+            border-radius: 15px;
         }
 
         .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 15px;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
         }
 
+        /* Category Cards (Horizontal Row) */
+        .categories {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 40px;
+        }
+
+        .cat-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            min-width: 120px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .cat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .cat-card img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 8px;
+        }
+
+        /* Deals Section */
         .section-title {
-            margin: 20px 0 10px;
-            color: #333;
+            font-size: 24px;
+            color: var(--dark-text);
+            margin-bottom: 20px;
         }
 
-        .products-grid {
+        .deals-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 20px;
+            margin-bottom: 40px;
         }
 
-        .product-card {
-            background: white;
-            border-radius: 10px;
+        .deal-card {
+            background: var(--card-bg);
+            border-radius: 15px;
             padding: 15px;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        .product-card img {
+        .deal-card img {
             width: 100%;
-            height: 120px;
+            height: 140px;
             object-fit: cover;
-            border-radius: 8px;
-        }
-
-        .product-card h3 {
-            font-size: 18px;
-            margin: 10px 0 5px;
-        }
-
-        .price {
-            color: var(--primary);
-            font-size: 16px;
-            font-weight: bold;
+            border-radius: 10px;
             margin-bottom: 10px;
         }
 
-        .add-btn {
+        .deal-card h3 {
+            font-size: 18px;
+            color: var(--dark-text);
+            margin-bottom: 5px;
+        }
+
+        .price {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 8px 0;
+        }
+
+        .add-cart-btn {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            width: 100%;
-            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
             font-weight: bold;
+            cursor: pointer;
+            width: 100%;
         }
 
-        /* Cart & Scratch Card Overlay */
+        /* Banner Box */
+        .promo-box {
+            background: var(--primary);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        /* Modal / Popups */
         .modal {
             display: none;
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top:0; left:0; width:100%; height:100%;
             background: rgba(0,0,0,0.6);
             justify-content: center;
             align-items: center;
@@ -148,8 +244,8 @@
 
         .modal-content {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 25px;
+            border-radius: 15px;
             max-width: 400px;
             width: 90%;
             position: relative;
@@ -159,24 +255,22 @@
             position: absolute;
             right: 15px;
             top: 10px;
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
         }
 
         .scratch-card {
-            width: 200px;
-            height: 100px;
-            background: #ccc;
+            width: 220px;
+            height: 110px;
+            background: #bdbdbd;
             margin: 20px auto;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 18px;
             font-weight: bold;
-            color: #333;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
-            border: 2px dashed #888;
+            border: 2px dashed #757575;
         }
 
         .scratch-card.revealed {
@@ -188,22 +282,69 @@
 </head>
 <body>
 
+    <!-- Header -->
     <header>
-        <div class="logo">🥬 FRESH PICK</div>
-        <div class="user-stats">
-            <div class="stat-box">Points: <span id="rewardPoints">0</span>/100</div>
+        <div class="logo">🥦 FRESH PICK</div>
+        <ul class="nav-links">
+            <li>Home</li>
+            <li>Fruits</li>
+            <li>Vegetables</li>
+            <li>Deals</li>
+        </ul>
+        <div class="user-panel">
+            <div class="points-badge">Points: <span id="rewardPoints">0</span>/100</div>
             <button class="cart-btn" onclick="toggleCart()">Cart (<span id="cartCount">0</span>)</button>
         </div>
     </header>
 
-    <div class="hero-banner">
-        <h1>Fresh Vegetables & Daily Groceries</h1>
-        <p>ഓരോ 100 രൂപയുടെ ഓർഡറിനും 10 റിവാർഡ് പോയിന്റുകൾ നേടൂ! 100 പോയിന്റ് ആകുമ്പോൾ അപ്പോൾ തന്നെ Scratch Card നേടാം!</p>
-    </div>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-text">
+            <h1>Fresh Fruits & Vegetables</h1>
+            <p>100% ജൈവരീതിയിൽ ഉൽപ്പാദിപ്പിച്ച പച്ചക്കറികളും ഫ്രെഷ് പഴവർഗ്ഗങ്ങളും ഏറ്റവും മികച്ച ഓഫറുകളിൽ വാങ്ങൂ.</p>
+            <button class="shop-btn">Shop Now</button>
+        </div>
+        <div class="hero-img">
+            <img src="https://images.unsplash.com/photo-1610348725531-843dff563e2c?w=500" alt="Fresh Vegetables">
+        </div>
+    </section>
 
     <div class="container">
-        <h2 class="section-title">Fresh Items</h2>
-        <div class="products-grid" id="productList"></div>
+        
+        <!-- Categories Horizontal Row -->
+        <h2 class="section-title">Categories</h2>
+        <div class="categories">
+            <div class="cat-card">
+                <img src="https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=150" alt="Fruits">
+                <div>Fruits</div>
+            </div>
+            <div class="cat-card">
+                <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=150" alt="Vegetables">
+                <div>Vegetables</div>
+            </div>
+            <div class="cat-card">
+                <img src="https://images.unsplash.com/photo-1563636619-e9143da7973b?w=150" alt="Milk">
+                <div>Dairy</div>
+            </div>
+            <div class="cat-card">
+                <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=150" alt="Juice">
+                <div>Juices</div>
+            </div>
+        </div>
+
+        <!-- Deal of the day section -->
+        <h2 class="section-title">Deal of the Day</h2>
+        <div class="deals-grid" id="productList"></div>
+
+        <!-- Reward Banner -->
+        <div class="promo-box">
+            <div>
+                <h2>ഓരോ വാങ്ങലിലും പോയിന്റുകൾ നേടൂ!</h2>
+                <p>100 പോയിന്റ് തികയുമ്പോൾ ഉടനടി ഫ്രീ സ്ക്രാച്ച് കാർഡും ആകർഷകമായ സമ്മാനങ്ങളും നേടാം.</p>
+            </div>
+            <button class="shop-btn" style="background: var(--accent); color: white;">Learn More</button>
+        </div>
+
     </div>
 
     <!-- Cart Modal -->
@@ -212,41 +353,41 @@
             <span class="close-btn" onclick="toggleCart()">&times;</span>
             <h2>Your Cart</h2>
             <div id="cartItems" style="margin: 15px 0;"></div>
-            <h3>Total: ₹<span id="cartTotal">0</span></h3>
-            <button class="add-btn" style="margin-top: 15px;" onclick="checkout()">Checkout Order</button>
+            <h3>Total Amount: ₹<span id="cartTotal">0</span></h3>
+            <button class="add-cart-btn" style="margin-top: 15px;" onclick="checkout()">Checkout Order</button>
         </div>
     </div>
 
     <!-- Scratch Card Modal -->
     <div class="modal" id="scratchModal">
         <div class="modal-content" style="text-align: center;">
-            <h2>🎉 Congrats! You unlocked a Scratch Card!</h2>
-            <p>കാർഡിൽ ക്ലിക്ക് ചെയ്ത് ഫ്രീ ഓഫർ നേടൂ:</p>
+            <h2>🎉 Scratch & Win!</h2>
+            <p>നിങ്ങൾക്ക് ഫ്രീ സ്ക്രാച്ച് കാർഡ് ലഭിച്ചിരിക്കുന്നു:</p>
             <div class="scratch-card" id="card" onclick="revealReward()">Click to Scratch!</div>
-            <button class="add-btn" id="claimBtn" style="display:none;" onclick="closeScratchModal()">Claim Reward</button>
+            <button class="add-cart-btn" id="claimBtn" style="display:none;" onclick="closeScratchModal()">Claim Reward</button>
         </div>
     </div>
 
     <script>
         const products = [
-            { id: 1, name: "Fresh Tomato (തക്കാളി)", price: 40, img: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=300" },
-            { id: 2, name: "Potato (ഉരുളക്കിഴങ്ങ്)", price: 35, img: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=300" },
-            { id: 3, name: "Onion (സവാള)", price: 50, img: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8ce?w=300" },
-            { id: 4, name: "Fresh Milk (പാൽ 1L)", price: 52, img: "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300" }
+            { id: 1, name: "Fresh Banana (നേന്ത്രപ്പഴം)", price: 60, img: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=300" },
+            { id: 2, name: "Fresh Tomato (തക്കാളി)", price: 40, img: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=300" },
+            { id: 3, name: "Fresh Orange (ഓറഞ്ച്)", price: 80, img: "https://images.unsplash.com/photo-1547514701-42782101795e?w=300" },
+            { id: 4, name: "Natural Jam (ജാം)", price: 120, img: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=300" }
         ];
 
         let cart = [];
         let points = 0;
-        const freeItems = ["1KG Tomato Free! 🍅", "500g Onion Free! 🧅", "1 Packet Milk Free! 🥛", "₹50 Discount Voucher! 🎟️"];
+        const freeRewards = ["1KG Tomato Free! 🍅", "500g Banana Free! 🍌", "₹50 Shopping Voucher! 🎟️", "Fresh Juice Free! 🧃"];
 
         function renderProducts() {
             const list = document.getElementById('productList');
             list.innerHTML = products.map(p => `
-                <div class="product-card">
+                <div class="deal-card">
                     <img src="${p.img}" alt="${p.name}">
                     <h3>${p.name}</h3>
                     <div class="price">₹${p.price}</div>
-                    <button class="add-btn" onclick="addToCart(${p.id})">Add to Cart</button>
+                    <button class="add-cart-btn" onclick="addToCart(${p.id})">Add to Cart</button>
                 </div>
             `).join('');
         }
@@ -282,32 +423,27 @@
             }
 
             const total = cart.reduce((sum, item) => sum + item.price, 0);
-            // 100 രൂപയ്ക്ക് 10 പോയിന്റ്
-            const earnedPoints = Math.floor(total / 10);
+            const earnedPoints = Math.floor(total / 10); // ₹100 = 10 points
             points += earnedPoints;
 
-            alert(`ഓർഡർ വിജയിച്ചു! നിങ്ങൾ ₹${total}-ന്റെ ഓർഡർ നൽകി. ${earnedPoints} പോയിന്റുകൾ ലഭിച്ചു!`);
+            alert(`ഓർഡർ വിജയിച്ചു! ലഭിച്ച റിവാർഡ് പോയിന്റുകൾ: ${earnedPoints}`);
             
             cart = [];
             updateCartUI();
             toggleCart();
 
             if (points >= 100) {
-                points = points - 100;
-                showScratchCard();
+                points -= 100;
+                document.getElementById('scratchModal').style.display = 'flex';
             }
 
             document.getElementById('rewardPoints').innerText = points;
         }
 
-        function showScratchCard() {
-            document.getElementById('scratchModal').style.display = 'flex';
-        }
-
         function revealReward() {
             const card = document.getElementById('card');
             if (!card.classList.contains('revealed')) {
-                const randomReward = freeItems[Math.floor(Math.random() * freeItems.length)];
+                const randomReward = freeRewards[Math.floor(Math.random() * freeRewards.length)];
                 card.innerText = randomReward;
                 card.classList.add('revealed');
                 document.getElementById('claimBtn').style.display = 'inline-block';
@@ -316,7 +452,6 @@
 
         function closeScratchModal() {
             document.getElementById('scratchModal').style.display = 'none';
-            // Reset scratch card for next time
             const card = document.getElementById('card');
             card.innerText = "Click to Scratch!";
             card.classList.remove('revealed');
@@ -327,4 +462,3 @@
     </script>
 </body>
 </html>
-
