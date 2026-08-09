@@ -1,1 +1,330 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRESH PICK - Fresh Vegetables & Groceries</title>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --accent: #ff9800;
+            --bg: #f4f6f8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            padding-bottom: 50px;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-stats {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .cart-btn {
+            background: var(--accent);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, #a8e063, #56ab2f);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .hero-banner h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .section-title {
+            margin: 20px 0 10px;
+            color: #333;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .product-card h3 {
+            font-size: 18px;
+            margin: 10px 0 5px;
+        }
+
+        .price {
+            color: var(--primary);
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .add-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Cart & Scratch Card Overlay */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .scratch-card {
+            width: 200px;
+            height: 100px;
+            background: #ccc;
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px dashed #888;
+        }
+
+        .scratch-card.revealed {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffeeba;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">🥬 FRESH PICK</div>
+        <div class="user-stats">
+            <div class="stat-box">Points: <span id="rewardPoints">0</span>/100</div>
+            <button class="cart-btn" onclick="toggleCart()">Cart (<span id="cartCount">0</span>)</button>
+        </div>
+    </header>
+
+    <div class="hero-banner">
+        <h1>Fresh Vegetables & Daily Groceries</h1>
+        <p>ഓരോ 100 രൂപയുടെ ഓർഡറിനും 10 റിവാർഡ് പോയിന്റുകൾ നേടൂ! 100 പോയിന്റ് ആകുമ്പോൾ അപ്പോൾ തന്നെ Scratch Card നേടാം!</p>
+    </div>
+
+    <div class="container">
+        <h2 class="section-title">Fresh Items</h2>
+        <div class="products-grid" id="productList"></div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div class="modal" id="cartModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="toggleCart()">&times;</span>
+            <h2>Your Cart</h2>
+            <div id="cartItems" style="margin: 15px 0;"></div>
+            <h3>Total: ₹<span id="cartTotal">0</span></h3>
+            <button class="add-btn" style="margin-top: 15px;" onclick="checkout()">Checkout Order</button>
+        </div>
+    </div>
+
+    <!-- Scratch Card Modal -->
+    <div class="modal" id="scratchModal">
+        <div class="modal-content" style="text-align: center;">
+            <h2>🎉 Congrats! You unlocked a Scratch Card!</h2>
+            <p>കാർഡിൽ ക്ലിക്ക് ചെയ്ത് ഫ്രീ ഓഫർ നേടൂ:</p>
+            <div class="scratch-card" id="card" onclick="revealReward()">Click to Scratch!</div>
+            <button class="add-btn" id="claimBtn" style="display:none;" onclick="closeScratchModal()">Claim Reward</button>
+        </div>
+    </div>
+
+    <script>
+        const products = [
+            { id: 1, name: "Fresh Tomato (തക്കാളി)", price: 40, img: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=300" },
+            { id: 2, name: "Potato (ഉരുളക്കിഴങ്ങ്)", price: 35, img: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=300" },
+            { id: 3, name: "Onion (സവാള)", price: 50, img: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8ce?w=300" },
+            { id: 4, name: "Fresh Milk (പാൽ 1L)", price: 52, img: "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300" }
+        ];
+
+        let cart = [];
+        let points = 0;
+        const freeItems = ["1KG Tomato Free! 🍅", "500g Onion Free! 🧅", "1 Packet Milk Free! 🥛", "₹50 Discount Voucher! 🎟️"];
+
+        function renderProducts() {
+            const list = document.getElementById('productList');
+            list.innerHTML = products.map(p => `
+                <div class="product-card">
+                    <img src="${p.img}" alt="${p.name}">
+                    <h3>${p.name}</h3>
+                    <div class="price">₹${p.price}</div>
+                    <button class="add-btn" onclick="addToCart(${p.id})">Add to Cart</button>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(id) {
+            const item = products.find(p => p.id === id);
+            cart.push(item);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            document.getElementById('cartCount').innerText = cart.length;
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById('cartTotal').innerText = total;
+
+            const cartItemsDiv = document.getElementById('cartItems');
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = "<p>Cart is empty</p>";
+            } else {
+                cartItemsDiv.innerHTML = cart.map(item => `<p>• ${item.name} - ₹${item.price}</p>`).join('');
+            }
+        }
+
+        function toggleCart() {
+            const modal = document.getElementById('cartModal');
+            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert("നിങ്ങളുടെ കാർട്ട് കാലിയാണ്!");
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            // 100 രൂപയ്ക്ക് 10 പോയിന്റ്
+            const earnedPoints = Math.floor(total / 10);
+            points += earnedPoints;
+
+            alert(`ഓർഡർ വിജയിച്ചു! നിങ്ങൾ ₹${total}-ന്റെ ഓർഡർ നൽകി. ${earnedPoints} പോയിന്റുകൾ ലഭിച്ചു!`);
+            
+            cart = [];
+            updateCartUI();
+            toggleCart();
+
+            if (points >= 100) {
+                points = points - 100;
+                showScratchCard();
+            }
+
+            document.getElementById('rewardPoints').innerText = points;
+        }
+
+        function showScratchCard() {
+            document.getElementById('scratchModal').style.display = 'flex';
+        }
+
+        function revealReward() {
+            const card = document.getElementById('card');
+            if (!card.classList.contains('revealed')) {
+                const randomReward = freeItems[Math.floor(Math.random() * freeItems.length)];
+                card.innerText = randomReward;
+                card.classList.add('revealed');
+                document.getElementById('claimBtn').style.display = 'inline-block';
+            }
+        }
+
+        function closeScratchModal() {
+            document.getElementById('scratchModal').style.display = 'none';
+            // Reset scratch card for next time
+            const card = document.getElementById('card');
+            card.innerText = "Click to Scratch!";
+            card.classList.remove('revealed');
+            document.getElementById('claimBtn').style.display = 'none';
+        }
+
+        renderProducts();
+    </script>
+</body>
+</html>
 
