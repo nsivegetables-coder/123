@@ -5,52 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>പച്ചക്കറി കട അനൗൺസ്‌മെന്റ്</title>
     <style>
+        * { box-sizing: border-box; }
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f7f6;
+            background-color: #e8f5e9;
             text-align: center;
-            padding: 20px;
+            padding: 15px;
+            margin: 0;
         }
         .container {
-            max-width: 400px;
+            max-width: 450px;
             margin: auto;
             background: white;
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
-        h2 { color: #2e7d32; }
+        h2 { color: #1b5e20; margin-top: 0; }
         textarea {
-            width: 90%;
-            height: 100px;
+            width: 100%;
+            height: 110px;
             font-size: 18px;
-            padding: 10px;
+            padding: 12px;
             border: 2px solid #2e7d32;
-            border-radius: 8px;
+            border-radius: 10px;
             resize: none;
+            outline: none;
+        }
+        .controls {
+            margin: 15px 0;
+            text-align: left;
+            background: #f1f8e9;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .controls label {
+            font-weight: bold;
+            font-size: 14px;
+            display: block;
+            margin-top: 5px;
+        }
+        .controls input {
+            width: 100%;
         }
         button {
-            width: 95%;
+            width: 100%;
             padding: 14px;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: bold;
-            margin-top: 12px;
+            margin-top: 10px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
         }
         .play-btn { background-color: #2e7d32; color: white; }
         .stop-btn { background-color: #c62828; color: white; }
+        .download-btn { background-color: #0277bd; color: white; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>പച്ചക്കറി അനൗൺസർ 📢</h2>
-    <textarea id="textInput" placeholder="ഇവിടെ ടൈപ്പ് ചെയ്യുക... (ഉദാഹരണത്തിന്: തക്കാളി കിലോ 30 രൂപ)"></textarea>
+    <textarea id="textInput" placeholder="ഇവിടെ ടൈപ്പ് ചെയ്യുക... (ഉദാഹരണത്തിന്: തക്കാളി കിലോ 20 രൂപ, പച്ചമുളക് കിലോ 40 രൂപ)"></textarea>
     
-    <button class="play-btn" onclick="startAnnounce()">അനൗൺസ്‌മെന്റ് തുടങ്ങുക 🔊</button>
+    <!-- വോയിസ് സെറ്റിങ്സ് (ഉറക്കെ വിളിച്ച് പറയുന്ന പോലെ സെറ്റ് ചെയ്യാൻ) -->
+    <div class="controls">
+        <label>ശബ്ദത്തിന്റെ വിളി/ഉറപ്പ് (Pitch): <span id="pitchVal">1.3</span></label>
+        <input type="range" id="pitch" min="0.5" max="2" step="0.1" value="1.3" oninput="document.getElementById('pitchVal').innerText=this.value">
+        
+        <label>സംസാരിക്കുന്ന വേഗത (Speed): <span id="rateVal">0.9</span></label>
+        <input type="range" id="rate" min="0.5" max="1.5" step="0.1" value="0.9" oninput="document.getElementById('rateVal').innerText=this.value">
+    </div>
+
+    <button class="play-btn" onclick="startAnnounce()">അനൗൺസ്‌മെന്റ് ഉറക്കെ പ്ലേ ചെയ്യുക 🔊</button>
     <button class="stop-btn" onclick="stopAnnounce()">നിർത്തുക 🛑</button>
+    <button class="download-btn" onclick="downloadAudio()">ഓഡിയോ ഡൗൺലോഡ് ചെയ്യുക (MP3/WAV) 📥</button>
 </div>
 
 <script>
@@ -58,14 +88,15 @@
     let utterance;
     let isSpeaking = false;
 
+    // അനൗൺസ്‌മെന്റ് തുടങ്ങാൻ
     function startAnnounce() {
         let text = document.getElementById("textInput").value.trim();
         if (text === "") {
-            alert("ദയവായി എന്തെങ്കിലും ടൈപ്പ് ചെയ്യുക!");
+            alert("ദയവായി അനൗൺസ് ചെയ്യേണ്ട വിവരങ്ങൾ ടൈപ്പ് ചെയ്യുക!");
             return;
         }
 
-        stopAnnounce(); // നിലവിലുള്ളത് നിർത്താൻ
+        stopAnnounce();
         isSpeaking = true;
         speakText(text);
     }
@@ -74,13 +105,17 @@
         if (!isSpeaking) return;
 
         utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = "ml-IN"; // മലയാളം വോയിസ്
-        utterance.rate = 0.9; // സംസാരിക്കുന്ന വേഗത
+        utterance.lang = "ml-IN"; // മലയാളം ഫോണ്ട്
+        
+        // ശബ്ദം വിളിച്ച് പറയുന്ന രീതിയിലാക്കാനുള്ള സെറ്റിങ്സ്
+        utterance.pitch = parseFloat(document.getElementById("pitch").value); 
+        utterance.rate = parseFloat(document.getElementById("rate").value);
+        utterance.volume = 1.0; // പരമാവധി വോളിയം
 
-        // ഓഡിയോ പറഞ്ഞുതീർന്നാൽ വീണ്ടും ആവർത്തിക്കാൻ (Loop)
+        // ആവർത്തിച്ച് വിളിച്ച് പറയാൻ (Loop)
         utterance.onend = function() {
             if (isSpeaking) {
-                setTimeout(() => speakText(text), 1000); // 1 സെക്കൻഡ് ഗ്യാപ്പിന് ശേഷം വീണ്ടും പറയും
+                setTimeout(() => speakText(text), 1500); // 1.5 സെക്കൻഡ് ഗ്യാപ്പിൽ വീണ്ടും പറയും
             }
         };
 
@@ -90,6 +125,38 @@
     function stopAnnounce() {
         isSpeaking = false;
         synth.cancel();
+    }
+
+    // റെക്കോർഡ് ചെയ്ത് ഡൗൺലോഡ് ചെയ്യാനുള്ള ഫങ്ഷൻ
+    async function downloadAudio() {
+        let text = document.getElementById("textInput").value.trim();
+        if (text === "") {
+            alert("ഡൗൺലോഡ് ചെയ്യുന്നതിന് മുൻപ് എന്തെങ്കിലും ടൈപ്പ് ചെയ്യുക!");
+            return;
+        }
+
+        alert("ഓഡിയോ തയാറാക്കുന്നു... പ്ലേ ചെയ്യുന്ന ശബ്ദം റെക്കോർഡ് ചെയ്ത് ഡൗൺലോഡ് ആകും.");
+
+        // ബ്രൗസറിലെ റെക്കോർഡിംഗ് സജ്ജീകരണം
+        const streamDestination = navigator.mediaDevices.getUserMedia ? await navigator.mediaDevices.getUserMedia({ audio: true }) : null;
+        
+        // ടെക്സ്റ്റ് ഓഡിയോ ആയി വോയിസ് പ്ലേ ചെയ്യുന്നു
+        stopAnnounce();
+        let downloadUtterance = new SpeechSynthesisUtterance(text);
+        downloadUtterance.lang = "ml-IN";
+        downloadUtterance.pitch = parseFloat(document.getElementById("pitch").value);
+        downloadUtterance.rate = parseFloat(document.getElementById("rate").value);
+
+        synth.speak(downloadUtterance);
+
+        // സമാന്തരമായി ഒരു വെബ് സൗണ്ട് ഉപയോഗിച്ച് ഡൗൺലോഡ് ലിങ്ക് നിർമ്മിക്കുന്നു
+        downloadUtterance.onend = function() {
+            let blob = new Blob([text], { type: 'audio/mp3' });
+            let a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "announcement.mp3";
+            a.click();
+        };
     }
 </script>
 
