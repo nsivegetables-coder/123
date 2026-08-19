@@ -2,743 +2,96 @@
 <html lang="ml">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FRESH PICK - Premium Grocery</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>പച്ചക്കറി കട അനൗൺസ്‌മെന്റ്</title>
     <style>
-        /* അടിസ്ഥാന ക്രമീകരണങ്ങൾ - മൊബൈലിനായി */
-        :root {
-            --primary-dark: #1a4d2e; /* Dark green for premium look */
-            --primary-light: #4caf50;
-            --accent: #ffc107; /* Gold for points/offers */
-            --bg-color: #f0f4f0;
-            --card-bg: #ffffff;
-            --text-main: #1a1a1a;
-            --text-sub: #666666;
-            --shadow: 0 4px 15px rgba(0,0,0,0.08);
-            --transition: all 0.3s ease;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif; /* Modern Font */
-            -webkit-tap-highlight-color: transparent; /* Removes blue highlight on tap */
-        }
-
-        /* പശ്ചാത്തലം */
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding-bottom: 80px; /* Space for bottom nav */
-            overflow-x: hidden;
-        }
-
-        /* ഹെഡർ - പ്രീമിയം ലുക്ക് */
-        header {
-            background: linear-gradient(135deg, var(--primary-dark), #2d6a4f);
-            color: white;
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            text-align: center;
             padding: 20px;
-            border-radius: 0 0 25px 25px;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 100;
         }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .logo {
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        /* റിവാർഡ് പോയിന്റ് ഡിസൈൻ */
-        .points-display {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        .points-icon {
-            color: var(--accent);
-            font-size: 16px;
-        }
-
-        /* സെർച്ച് ബാർ */
-        .search-bar {
-            background: white;
-            border-radius: 15px;
-            padding: 12px 15px;
-            display: flex;
-            align-items: center;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .search-bar input {
-            border: none;
-            outline: none;
-            width: 100%;
-            font-size: 14px;
-            margin-left: 10px;
-            color: var(--text-main);
-        }
-
-        /* കണ്ടൈനർ */
         .container {
-            padding: 20px;
-        }
-
-        /* ഓഫർ ബാനർ - സ്ലൈഡർ ലുക്ക് */
-        .promo-banner {
-            background: linear-gradient(135deg, #a8e063, #56ab2f);
-            color: white;
-            padding: 25px;
-            border-radius: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .promo-banner h2 {
-            font-size: 20px;
-            margin-bottom: 5px;
-            position: relative; z-index: 2;
-        }
-
-        .promo-banner p {
-            font-size: 13px;
-            opacity: 0.9;
-            margin-bottom: 15px;
-            position: relative; z-index: 2;
-        }
-
-        .promo-btn {
-            background: var(--accent);
-            color: var(--primary-dark);
-            border: none;
-            padding: 8px 18px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 12px;
-            cursor: pointer;
-            position: relative; z-index: 2;
-        }
-        
-        /* ബാനറിലെ അലങ്കാരം */
-        .promo-banner::after {
-            content: '🥬';
-            position: absolute;
-            font-size: 80px;
-            right: -10px;
-            bottom: -20px;
-            opacity: 0.2;
-            transform: rotate(-15deg);
-        }
-
-        /* കാറ്റഗറി - വട്ടത്തിലുള്ള ഡിസൈൻ */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary-dark);
-        }
-
-        .see-all {
-            font-size: 13px;
-            color: var(--primary-light);
-            font-weight: 600;
-        }
-
-        .categories {
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
-            padding: 5px 0 15px 0;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        /* സ്ക്രോൾബാർ മറയ്ക്കാൻ */
-        .categories::-webkit-scrollbar {
-            display: none;
-        }
-
-        .cat-item {
-            flex: 0 0 auto;
-            text-align: center;
-            width: 70px;
-        }
-
-        .cat-icon {
-            width: 65px;
-            height: 65px;
-            background-color: var(--card-bg);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 28px;
-            box-shadow: var(--shadow);
-            margin-bottom: 8px;
-            transition: var(--transition);
-            border: 2px solid transparent;
-        }
-        
-        .cat-item:active .cat-icon {
-            transform: scale(0.9);
-            border-color: var(--primary-light);
-        }
-
-        .cat-item span {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        /* പ്രൊഡക്റ്റ് ഗ്രിഡ് - മൊബൈലിൽ 2 എണ്ണം വീതം */
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .product-card {
-            background-color: var(--card-bg);
-            border-radius: 18px;
-            padding: 12px;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .product-card:active {
-            transform: scale(0.97);
-        }
-
-        .wishlist-icon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            color: #ccc;
-            font-size: 16px;
-        }
-
-        .product-img {
-            width: 100%;
-            height: 100px;
-            object-fit: contain;
-            margin-bottom: 10px;
-        }
-
-        .product-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-main);
-            margin-bottom: 4px;
-            height: 38px; /* Two lines height */
-            overflow: hidden;
-        }
-
-        .product-qty {
-            font-size: 11px;
-            color: var(--text-sub);
-            margin-bottom: 8px;
-        }
-
-        .product-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: auto;
-        }
-
-        .product-price {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--primary-dark);
-        }
-
-        .add-btn {
-            background-color: var(--primary-light);
-            color: white;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 3px 6px rgba(76, 175, 80, 0.2);
-        }
-
-        /* ബോട്ടം നാവിഗേഷൻ ബാർ - മൊബൈൽ സ്റ്റൈൽ */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 65px;
-            background-color: var(--card-bg);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
-            z-index: 90;
-            border-radius: 20px 20px 0 0;
-        }
-
-        .nav-item {
-            text-align: center;
-            color: var(--text-sub);
-            font-size: 11px;
-            font-weight: 600;
-            position: relative;
-        }
-
-        .nav-item.active {
-            color: var(--primary-dark);
-        }
-
-        .nav-icon {
-            font-size: 20px;
-            margin-bottom: 2px;
-            display: block;
-        }
-        
-        /* കാർട്ട് ഐക്കണിലെ ബാഡ്ജ് */
-        .cart-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: #ff5252;
-            color: white;
-            font-size: 10px;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: 700;
-        }
-
-        /* മോഡലുകൾ (Cart/Scratch) - മൊബൈൽ സ്റ്റൈൽ */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: flex-end; /* Bottom sheet style */
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .modal.show {
-            display: flex;
-            opacity: 1;
-        }
-
-        .modal-content {
+            max-width: 400px;
+            margin: auto;
             background: white;
-            padding: 25px;
-            border-radius: 25px 25px 0 0;
-            width: 100%;
-            max-height: 80%;
-            overflow-y: auto;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        
-        .modal.show .modal-content {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .close-btn {
-            font-size: 24px;
-            color: var(--text-sub);
-            cursor: pointer;
-        }
-
-        /* കാർട്ട് ഐറ്റങ്ങൾ */
-        .cart-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .cart-item img {
-            width: 50px; height: 50px; object-fit: contain;
-        }
-        
-        .cart-item-info flex: 1;
-        
-        .cart-item-name { font-size: 14px; font-weight: 600; }
-        .cart-item-price { font-size: 13px; color: var(--primary-light); font-weight: 700; }
-
-        .checkout-btn {
-            background-color: var(--primary-dark);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 15px;
-            width: 100%;
-            font-size: 16px;
-            font-weight: 700;
-            margin-top: 20px;
-            cursor: pointer;
-        }
-
-        /* സ്ക്രാച്ച് കാർഡ് - മെച്ചപ്പെടുത്തിയത് */
-        .scratch-container {
-            text-align: center;
-            padding: 20px 0;
-        }
-
-        .scratch-card {
-            width: 250px;
-            height: 125px;
-            background: linear-gradient(135deg, #bdbdbd, #9e9e9e);
-            margin: 20px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        h2 { color: #2e7d32; }
+        textarea {
+            width: 90%;
+            height: 100px;
             font-size: 18px;
-            font-weight: 700;
-            color: rgba(255,255,255,0.8);
-            border-radius: 15px;
+            padding: 10px;
+            border: 2px solid #2e7d32;
+            border-radius: 8px;
+            resize: none;
+        }
+        button {
+            width: 95%;
+            padding: 14px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 12px;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
         }
-        
-        /* സ്ക്രാച്ച് ചെയ്യുമ്പോഴുള്ള തിളക്കം */
-        .scratch-card::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
-            transform: rotate(45deg);
-            animation: shine 3s infinite;
-        }
-        
-        @keyframes shine {
-            0% { left: -50%; }
-            100% { left: 150%; }
-        }
-
-        .scratch-card.revealed {
-            background: #fff3cd;
-            color: #856404;
-            border: 2px solid #ffeeba;
-            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.2);
-        }
-        
-        .scratch-card.revealed::before { display: none; }
-
-        /* ഫോണ്ടുകൾ ലോഡ് ചെയ്യാൻ */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        .play-btn { background-color: #2e7d32; color: white; }
+        .stop-btn { background-color: #c62828; color: white; }
     </style>
 </head>
 <body>
 
-    <!-- മൊബൈൽ ഹെഡർ -->
-    <header>
-        <div class="header-top">
-            <div class="logo">FRESH PICK</div>
-            <div class="points-display" onclick="showPointsAlert()">
-                <span class="points-icon">⭐</span>
-                <span><span id="rewardPoints">0</span> / 100</span>
-            </div>
-        </div>
-        <div class="search-bar">
-            <span>🔍</span>
-            <input type="text" placeholder="തിരയുക (തക്കാളി, പാൽ...)">
-        </div>
-    </header>
+<div class="container">
+    <h2>പച്ചക്കറി അനൗൺസർ 📢</h2>
+    <textarea id="textInput" placeholder="ഇവിടെ ടൈപ്പ് ചെയ്യുക... (ഉദാഹരണത്തിന്: തക്കാളി കിലോ 30 രൂപ)"></textarea>
+    
+    <button class="play-btn" onclick="startAnnounce()">അനൗൺസ്‌മെന്റ് തുടങ്ങുക 🔊</button>
+    <button class="stop-btn" onclick="stopAnnounce()">നിർത്തുക 🛑</button>
+</div>
 
-    <div class="container">
-        
-        <!-- ഓഫർ ബാനർ -->
-        <div class="promo-banner">
-            <h2>ഗ്രാൻഡ് ഓഫർ!</h2>
-            <p>ഇന്ന് 10% കിഴിവ് എല്ലാ പച്ചക്കറികൾക്കും. കൂടാതെ പോയിന്റുകൾ ഡബിൾ!</p>
-            <button class="promo-btn">Shop Now</button>
-        </div>
+<script>
+    let synth = window.speechSynthesis;
+    let utterance;
+    let isSpeaking = false;
 
-        <!-- കാറ്റഗറികൾ -->
-        <div class="section-header">
-            <h2 class="section-title">വിഭാഗങ്ങൾ</h2>
-            <span class="see-all">See All</span>
-        </div>
-        <div class="categories">
-            <div class="cat-item">
-                <div class="cat-icon">🍅</div>
-                <span>പച്ചക്കറി</span>
-            </div>
-            <div class="cat-item">
-                <div class="cat-icon">🍎</div>
-                <span>പഴങ്ങൾ</span>
-            </div>
-            <div class="cat-item">
-                <div class="cat-icon">🥛</div>
-                <span>പാൽ</span>
-            </div>
-            <div class="cat-item">
-                <div class="cat-icon">🍞</div>
-                <span>ബേക്കറി</span>
-            </div>
-            <div class="cat-item">
-                <div class="cat-icon">🧂</div>
-                <span>മസാല</span>
-            </div>
-        </div>
-
-        <!-- പ്രൊഡക്റ്റുകൾ -->
-        <div class="section-header" style="margin-top: 10px;">
-            <h2 class="section-title">ഇന്നത്തെ ഓഫറുകൾ</h2>
-        </div>
-        <div class="products-grid" id="productList">
-            <!-- പ്രൊഡക്റ്റുകൾ ഇവിടെ ജാവാസ്ക്രിപ്റ്റ് വഴി വരും -->
-        </div>
-
-    </div>
-
-    <!-- മൊബൈൽ ബോട്ടം നാവിഗേഷൻ -->
-    <nav class="bottom-nav">
-        <div class="nav-item active">
-            <span class="nav-icon">🏠</span>
-            Home
-        </div>
-        <div class="nav-item">
-            <span class="nav-icon">🔍</span>
-            Search
-        </div>
-        <div class="nav-item" onclick="toggleModal('cartModal')">
-            <span class="nav-icon">🛒</span>
-            Cart
-            <div class="cart-badge" id="cartCount">0</div>
-        </div>
-        <div class="nav-item">
-            <span class="nav-icon">👤</span>
-            Account
-        </div>
-    </nav>
-
-    <!-- കാർട്ട് മോഡൽ (Bottom Sheet Style) -->
-    <div class="modal" id="cartModal" onclick="closeModalOnOutsideClick(event, 'cartModal')">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>നിങ്ങളുടെ കാർട്ട്</h2>
-                <span class="close-btn" onclick="toggleModal('cartModal')">&times;</span>
-            </div>
-            <div id="cartItems">
-                <!-- കാർട്ട് ഐറ്റങ്ങൾ ഇവിടെ വരും -->
-            </div>
-            <div style="margin-top: 20px; display: flex; justify-content: space-between; font-weight: 700; font-size: 18px;">
-                <span>ആകെ തുക:</span>
-                <span>₹<span id="cartTotal">0</span></span>
-            </div>
-            <button class="checkout-btn" onclick="checkout()">ഓർഡർ ചെയ്യുക</button>
-        </div>
-    </div>
-
-    <!-- സ്ക്രാച്ച് കാർഡ് മോഡൽ -->
-    <div class="modal" id="scratchModal">
-        <div class="modal-content" style="border-radius: 25px;">
-            <div class="modal-header">
-                <h2>🎉 അഭിനന്ദനങ്ങൾ!</h2>
-                <span class="close-btn" onclick="toggleModal('scratchModal')">&times;</span>
-            </div>
-            <div class="scratch-container">
-                <p style="color: var(--text-sub); font-size: 14px;">നിങ്ങൾക്ക് 100 പോയിന്റ് തികഞ്ഞു! താഴെ കാണുന്ന കാർഡ് സ്ക്രാച്ച് ചെയ്ത് സമ്മാനം നേടൂ.</p>
-                <div class="scratch-card" id="card" onclick="revealReward()">Scratch Here!</div>
-                <button class="checkout-btn" id="claimBtn" style="display:none; background-color: var(--accent); color: var(--primary-dark);" onclick="toggleModal('scratchModal')">Claim Reward</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // കൂടുതൽ റിയലിസ്റ്റിക് ആയ പ്രൊഡക്റ്റ് ഡാറ്റ
-        const products = [
-            { id: 1, name: "നാടൻ തക്കാളി (Tomato)", qty: "1 KG", price: 38, img: "https://i.imgur.com/8uO0MhR.png" },
-            { id: 2, name: "പഞ്ചാബി ഉരുളക്കിഴങ്ങ് (Potato)", qty: "1 KG", price: 32, img: "https://i.imgur.com/U8j4Nf8.png" },
-            { id: 3, name: "നാടൻ സവാള (Onion)", qty: "1 KG", price: 45, img: "https://i.imgur.com/9v4J4p8.png" },
-            { id: 4, name: "മിൽമ പാൽ (Milma Milk)", qty: "500 ML", price: 26, img: "https://i.imgur.com/k6FpY2H.png" },
-            { id: 5, name: "വെണ്ടയ്ക്ക (Ladies Finger)", qty: "500 G", price: 22, img: "https://i.imgur.com/W2kY2S8.png" },
-            { id: 6, name: "ഏത്തപ്പഴം (Banana)", qty: "1 KG", price: 55, img: "https://i.imgur.com/mO8H3Yg.png" }
-        ];
-
-        let cart = [];
-        let points = 0;
-        const freeRewards = ["1KG തക്കാളി സൗജന്യം! 🍅", "500g ഏത്തപ്പഴം സൗജന്യം! 🍌", "₹50 ഡിസ്കൗണ്ട് കൂപ്പൺ! 🎟️", "ഒരു പാക്കറ്റ് പാൽ സൗജന്യം! 🥛"];
-
-        // പ്രൊഡക്റ്റുകൾ സ്ക്രീനിൽ കാണിക്കാൻ
-        function renderProducts() {
-            const list = document.getElementById('productList');
-            list.innerHTML = products.map(p => `
-                <div class="product-card">
-                    <span class="wishlist-icon">🤍</span>
-                    <img src="${p.img}" alt="${p.name}" class="product-img">
-                    <div class="product-name">${p.name}</div>
-                    <div class="product-qty">${p.qty}</div>
-                    <div class="product-footer">
-                        <div class="product-price">₹${p.price}</div>
-                        <button class="add-btn" onclick="addToCart(${p.id})">+</button>
-                    </div>
-                </div>
-            `).join('');
+    function startAnnounce() {
+        let text = document.getElementById("textInput").value.trim();
+        if (text === "") {
+            alert("ദയവായി എന്തെങ്കിലും ടൈപ്പ് ചെയ്യുക!");
+            return;
         }
 
-        // കാർട്ടിലേക്ക് ആഡ് ചെയ്യാൻ
-        function addToCart(id) {
-            const item = products.find(p => p.id === id);
-            cart.push(item);
-            
-            // ഹാപ്ടിക് ഫീഡ്‌ബാക്ക് പോലെ ചെറിയ വൈബ്രേഷൻ (സപ്പോർട്ട് ഉണ്ടെങ്കിൽ)
-            if (navigator.vibrate) navigator.vibrate(50);
-            
-            updateCartUI();
-        }
+        stopAnnounce(); // നിലവിലുള്ളത് നിർത്താൻ
+        isSpeaking = true;
+        speakText(text);
+    }
 
-        // കാർട്ട് അപ്ഡേറ്റ് ചെയ്യാൻ
-        function updateCartUI() {
-            // ബോട്ടം നാവിലെ കാർട്ട് കൗണ്ട്
-            document.getElementById('cartCount').innerText = cart.length;
-            
-            // ആകെ തുക
-            const total = cart.reduce((sum, item) => sum + item.price, 0);
-            document.getElementById('cartTotal').innerText = total;
+    function speakText(text) {
+        if (!isSpeaking) return;
 
-            // കാർട്ടിനുള്ളിലെ ഐറ്റങ്ങൾ
-            const cartItemsDiv = document.getElementById('cartItems');
-            if (cart.length === 0) {
-                cartItemsDiv.innerHTML = `<div style="text-align:center; padding: 20px; color: #ccc;">
-                    <div style="font-size:50px;">🛒</div>
-                    <p>കാർട്ട് കാലിയാണ്</p>
-                </div>`;
-            } else {
-                cartItemsDiv.innerHTML = cart.map(item => `
-                    <div class="cart-item">
-                        <img src="${item.img}" alt="${item.name}">
-                        <div class="cart-item-info">
-                            <div class="cart-item-name">${item.name}</div>
-                            <div class="cart-item-price">₹${item.price}</div>
-                        </div>
-                    </div>
-                `).join('');
+        utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "ml-IN"; // മലയാളം വോയിസ്
+        utterance.rate = 0.9; // സംസാരിക്കുന്ന വേഗത
+
+        // ഓഡിയോ പറഞ്ഞുതീർന്നാൽ വീണ്ടും ആവർത്തിക്കാൻ (Loop)
+        utterance.onend = function() {
+            if (isSpeaking) {
+                setTimeout(() => speakText(text), 1000); // 1 സെക്കൻഡ് ഗ്യാപ്പിന് ശേഷം വീണ്ടും പറയും
             }
-        }
+        };
 
-        // മോഡലുകൾ തുറക്കാനും അടയ്ക്കാനും
-        function toggleModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal.classList.contains('show')) {
-                modal.classList.remove('show');
-                // സ്ക്രോളിംഗ് തിരികെ കൊണ്ടുവരാൻ
-                setTimeout(() => { modal.style.display = 'none'; document.body.style.overflow = ''; }, 300);
-            } else {
-                modal.style.display = 'flex';
-                // സ്ക്രോളിംഗ് തടയാൻ
-                document.body.style.overflow = 'hidden';
-                setTimeout(() => modal.classList.add('show'), 10);
-            }
-        }
-        
-        // മോഡലിന് പുറത്ത് ക്ലിക്ക് ചെയ്താൽ അടയ്ക്കാൻ
-        function closeModalOnOutsideClick(event, modalId) {
-            if (event.target.id === modalId) {
-                toggleModal(modalId);
-            }
-        }
+        synth.speak(utterance);
+    }
 
-        // ഓർഡർ പൂർത്തിയാക്കാൻ (പോയിന്റ് ലഭിക്കാൻ)
-        function checkout() {
-            if (cart.length === 0) {
-                alert("കാർട്ട് കാലിയാണ്!");
-                return;
-            }
+    function stopAnnounce() {
+        isSpeaking = false;
+        synth.cancel();
+    }
+</script>
 
-            const total = cart.reduce((sum, item) => sum + item.price, 0);
-            
-            // 10 രൂപയ്ക്ക് 1 പോയിന്റ് (മുൻപ് പറഞ്ഞത് അനുസരിച്ച് മാറ്റി)
-            const earnedPoints = Math.floor(total / 10); 
-            points += earnedPoints;
-
-            alert(`ഓർഡർ വിജയിച്ചു! ₹${total}-ന്റെ ഓർഡർ നൽകി. നിങ്ങൾക്ക് ${earnedPoints} റിവാർഡ് പോയിന്റുകൾ ലഭിച്ചു.`);
-            
-            // കാർട്ട് ക്ലിയർ ചെയ്യുക
-            cart = [];
-            updateCartUI();
-            toggleModal('cartModal'); // കാർട്ട് അടയ്ക്കുക
-
-            // 100 പോയിന്റ് തികഞ്ഞോ എന്ന് നോക്കുക
-            if (points >= 100) {
-                points -= 100; // 100 പോയിന്റ് കുറയ്ക്കുക
-                setTimeout(() => toggleModal('scratchModal'), 500); // സ്ക്രാച്ച് കാർഡ് കാണിക്കുക
-            }
-
-            // സ്ക്രീനിൽ പോയിന്റ് അപ്ഡേറ്റ് ചെയ്യുക
-            document.getElementById('rewardPoints').innerText = points;
-        }
-
-        // സ്ക്രാച്ച് കാർഡ് തുറക്കാൻ
-        function revealReward() {
-            const card = document.getElementById('card');
-            if (!card.classList.contains('revealed')) {
-                // ഏതെങ്കിലും ഒരു സമ്മാനം തിരഞ്ഞെടുക്കുക
-                const randomReward = freeRewards[Math.floor(Math.random() * freeRewards.length)];
-                card.innerText = randomReward;
-                card.classList.add('revealed');
-                
-                // ക്ലെയിം ബട്ടൺ കാണിക്കുക
-                document.getElementById('claimBtn').style.display = 'block';
-                
-                if (navigator.vibrate) navigator.vibrate([100, 50, 100]); // വിജയിച്ച സന്തോഷത്തിൽ വൈബ്രേഷൻ
-            }
-        }
-        
-        function showPointsAlert() {
-            alert(`നിങ്ങളുടെ കൈവശം ${points} പോയിന്റുകൾ ഉണ്ട്. 100 പോയിന്റ് ആകുമ്പോൾ നിങ്ങൾക്ക് സർപ്രൈസ് സമ്മാനം ലഭിക്കും!`);
-        }
-
-        // ആപ്പ് തുടങ്ങുമ്പോൾ പ്രൊഡക്റ്റുകൾ ലോഡ് ചെയ്യുക
-        renderProducts();
-    </script>
 </body>
 </html>
