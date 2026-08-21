@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>പച്ചക്കറി കച്ചവട അനൗൺസർ 📢</title>
+    <title>പച്ചക്കറി കട അനൗൺസർ 📢</title>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -61,13 +61,12 @@
 <body>
 
 <div class="container">
-    <h2>പച്ചക്കറി കട അനൗൺസർ 📢</h2>
+    <h2>പച്ചക്കറി കട അനൗൺസർ 📢 (ആൺ ശബ്ദം)</h2>
     
     <textarea id="textInput" placeholder="ഉദാഹരണത്തിന്: ഉരുളക്കിഴങ്ങേ ഉരുളക്കിഴങ്ങേ ഉരുളക്കിഴങ്ങേ... 4 കിലോ 100 റേ!"></textarea>
     
     <div>
-        <p style="margin: 5px 0; font-size: 14px; font-weight: bold;">മോഡൽ റെഡിമെയ്ഡ് വാചകം ഉപയോഗിക്കാൻ:</p>
-        <button class="quick-btn" onclick="setSample()">ഉരുളക്കിഴങ് + തക്കാളി ഓഫർ ടൈപ്പ് ചെയ്യുക</button>
+        <button class="quick-btn" onclick="setSample()">മാതൃകാ വാചകം ചേർക്കുക</button>
     </div>
 
     <button class="play-btn" onclick="startAnnounce()">ഉറക്കെ വിളിച്ച് പറയുക 🔊</button>
@@ -79,8 +78,17 @@
     let synth = window.speechSynthesis;
     let utterance;
     let isSpeaking = false;
+    let voices = [];
 
-    // നിങ്ങൾ നൽകിയ മാതൃകയിലുള്ള ടെക്സ്റ്റ് സെറ്റ് ചെയ്യാൻ
+    // സിസ്റ്റത്തിലെ വോയിസുകൾ ലോഡ് ചെയ്യാൻ
+    function loadVoices() {
+        voices = synth.getVoices();
+    }
+    loadVoices();
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
     function setSample() {
         document.getElementById("textInput").value = "ഉരുളക്കിഴങ്ങേ... ഉരുളക്കിഴങ്ങേ... ഉരുളക്കിഴങ്ങേ... നാല് കിലോ നൂറേ... നാല് കിലോ നൂറേ! \nതക്കാളിയെ... തക്കാളിയെ... തക്കാളിയെ... അഞ്ച് കിലോ നൂറേ... അഞ്ച് കിലോ നൂറേ!";
     }
@@ -101,17 +109,22 @@
         if (!isSpeaking) return;
 
         utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = "ml-IN"; // മലയാളം
-        
-        // ഉറക്കെ വിളിച്ചുപറയുന്ന രീതിയിലുള്ള മാറ്റങ്ങൾ
-        utterance.pitch = 1.4; // ശബ്ദത്തിന്റെ ഉയർന്ന തരംഗം (വിളിച്ചുപറയൽ ശൈലി ലഭിക്കാൻ)
-        utterance.rate = 0.95; // വ്യക്തത ലഭിക്കാനുള്ള വേഗത
-        utterance.volume = 1.0; // പരമാവധി വോളിയം
+        utterance.lang = "ml-IN";
 
-        // അനൗൺസ്‌മെന്റ് തീർന്നാൽ നിർത്തി നിർത്തി ആവർത്തിക്കാൻ
+        // ആൺ ശബ്ദം (Male Voice) കണ്ടെത്താൻ ശ്രമിക്കുന്നു
+        let maleVoice = voices.find(v => v.lang.includes("ml") && (v.name.toLowerCase().includes("male") || v.name.toLowerCase().includes("man")));
+        if (maleVoice) {
+            utterance.voice = maleVoice;
+        }
+
+        // ശബ്ദത്തിന് ആൺ ശബ്ദത്തിന്റെ ഗാംഭീര്യവും കനവും നൽകാൻ Pitch കുറയ്ക്കുന്നു
+        utterance.pitch = 0.7; // Pitch കുറയ്ക്കുമ്പോൾ ശബ്ദത്തിന് കനം കൂടും (Male Sound Effect)
+        utterance.rate = 0.9;  // വ്യക്തമായി ഉറക്കെ വിളിച്ചുപറയാനുള്ള വേഗത
+        utterance.volume = 1.0;
+
         utterance.onend = function() {
             if (isSpeaking) {
-                setTimeout(() => speakText(text), 1000); // 1 സെക്കൻഡ് ഗ്യാപ്പിൽ വീണ്ടും പറയും
+                setTimeout(() => speakText(text), 1000);
             }
         };
 
@@ -123,7 +136,6 @@
         synth.cancel();
     }
 
-    // ശബ്ദം റെക്കോർഡ് ചെയ്ത് ഡൗൺലോഡ് ചെയ്യാനുള്ള വഴി
     function downloadAudio() {
         let text = document.getElementById("textInput").value.trim();
         if (text === "") {
@@ -133,15 +145,13 @@
 
         alert("പ്ലേ ചെയ്യുന്ന ശബ്ദം റെക്കോർഡ് ചെയ്യുന്നു... സൗണ്ട് തീർന്ന ഉടൻ ഡൗൺലോഡ് ഫയൽ ലഭിക്കും.");
         
-        // ടെക്സ്റ്റ് വോയിസ് ആയി പ്ലേ ചെയ്യുന്നു
         startAnnounce();
 
-        // ടെക്സ്റ്റ് ഫയൽ ഓഡിയോ ഡൗൺലോഡ് ആക്കുന്ന ട്രിഗർ
         setTimeout(() => {
             let blob = new Blob([text], { type: 'audio/mp3' });
             let a = document.createElement("a");
             a.href = URL.createObjectURL(blob);
-            a.download = "vegetable_announcement.mp3";
+            a.download = "male_announcement.mp3";
             a.click();
         }, 3000);
     }
