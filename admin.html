@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRESH PICK - Admin Panel</title>
+    <style>
+        :root {
+            --primary: #1a4d2e;
+            --accent: #4caf50;
+            --bg: #f4f6f8;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--bg); padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2 { color: var(--primary); margin-bottom: 20px; text-align: center; font-size: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #333; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; outline: none; }
+        button { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #133a22; }
+        .card { background: #fff; border: 1px solid #e0e0e0; padding: 15px; border-radius: 10px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .card-info { font-size: 14px; }
+        .price-tag { color: var(--accent); font-weight: bold; }
+        .delete-btn { background: #ff5252; width: auto; padding: 6px 12px; font-size: 12px; }
+    </style>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h2>FRESH PICK - അഡ്മിൻ പാനൽ 🛠️</h2>
+
+    <!-- പ്രൊഡക്റ്റ് ആഡ് ചെയ്യാനുള്ള ഫോം -->
+    <div style="background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 25px;">
+        <h3 style="font-size: 16px; margin-bottom: 10px; color: var(--primary);">പുതിയ ഉൽപ്പന്നം / വില മാറ്റം</h3>
+        <div class="form-group">
+            <label>ഉൽപ്പന്നത്തിന്റെ പേര്</label>
+            <input type="text" id="pName" placeholder="ഉദാഹരണത്തിന്: നാടൻ തക്കാളി">
+        </div>
+        <div class="form-group">
+            <label>അളവ് (Quantity)</label>
+            <input type="text" id="pQty" placeholder="ഉദാഹരണത്തിന്: 1 KG, 500g">
+        </div>
+        <div class="form-group">
+            <label>വില (₹)</label>
+            <input type="number" id="pPrice" placeholder="ഉദാഹരണത്തിന്: 40">
+        </div>
+        <div class="form-group">
+            <label>ചിത്രത്തിന്റെ ലിങ്ക് (Image URL)</label>
+            <input type="text" id="pImg" placeholder="https://example.com/image.jpg">
+        </div>
+        <button onclick="addProduct()">Save Product</button>
+    </div>
+
+    <!-- സ്ക്രാച്ച് കാർഡ് ഓഫർ സെറ്റ് ചെയ്യാൻ -->
+    <div style="background: #fff8e1; padding: 15px; border-radius: 10px; margin-bottom: 25px; border: 1px solid #ffe082;">
+        <h3 style="font-size: 16px; margin-bottom: 10px; color: #b78103;">സ്ക്രാച്ച് കാർഡ് ഓഫർ നൽകുക 🎁</h3>
+        <div class="form-group">
+            <label>ഓഫർ വിവരങ്ങൾ</label>
+            <input type="text" id="rewardText" placeholder="ഉദാ: 1KG തക്കാളി സൗജന്യം! / ₹50 ഓഫർ">
+        </div>
+        <button style="background: #f57f17;" onclick="addReward()">Add Scratch Reward</button>
+    </div>
+
+    <h3 style="font-size: 16px; margin-top: 20px;">നിലവിലുള്ള പ്രൊഡക്റ്റുകൾ:</h3>
+    <div id="adminProductList">പൊരുത്തപ്പെടുത്തുന്നു...</div>
+</div>
+
+<script>
+    // നിങ്ങളുടെ ഫയർബേസ് കോൺഫിഗറേഷൻ
+    const firebaseConfig = {
+        apiKey: "AIzaSyDK_YOTaJf__QlDz_1HASByhR5dV0tvuM4",
+        authDomain: "fresh-pick-1346b.firebaseapp.com",
+        projectId: "fresh-pick-1346b",
+        storageBucket: "fresh-pick-1346b.firebasestorage.app",
+        messagingSenderId: "266778456541",
+        appId: "1:266778456541:web:246305a1c69535c8efc634"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // പ്രൊഡക്റ്റ് സേവ് ചെയ്യാൻ
+    function addProduct() {
+        const name = document.getElementById('pName').value;
+        const qty = document.getElementById('pQty').value;
+        const price = Number(document.getElementById('pPrice').value);
+        const img = document.getElementById('pImg').value;
+
+        if(!name || !price) {
+            alert('പേരും വിലയും നിർബന്ധമാണ്!');
+            return;
+        }
+
+        db.collection("products").add({
+            name: name,
+            qty: qty || "1 KG",
+            price: price,
+            img: img || "https://i.imgur.com/8uO0MhR.png"
+        }).then(() => {
+            alert("ഉൽപ്പന്നം വിജയകരമായി സേവ് ചെയ്തു!");
+            document.getElementById('pName').value = '';
+            document.getElementById('pPrice').value = '';
+            document.getElementById('pImg').value = '';
+        });
+    }
+
+    // സ്ക്രാച്ച് കാർഡ് ഓഫർ സേവ് ചെയ്യാൻ
+    function addReward() {
+        const reward = document.getElementById('rewardText').value;
+        if(!reward) return;
+
+        db.collection("rewards").add({
+            offer: reward
+        }).then(() => {
+            alert("ഓഫർ സ്ക്രാച്ച് കാർഡിലേക്ക് ചേർത്തുകഴിഞ്ഞു!");
+            document.getElementById('rewardText').value = '';
+        });
+    }
+
+    // നിലവിലുള്ള പ്രൊഡക്റ്റുകൾ കാണിക്കാൻ
+    db.collection("products").onSnapshot((snapshot) => {
+        const list = document.getElementById('adminProductList');
+        list.innerHTML = "";
+        snapshot.forEach((doc) => {
+            const p = doc.data();
+            list.innerHTML += `
+                <div class="card">
+                    <div class="card-info">
+                        <strong>${p.name}</strong> (${p.qty})<br>
+                        <span class="price-tag">₹${p.price}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteProduct('${doc.id}')">Delete</button>
+                </div>
+            `;
+        });
+    });
+
+    function deleteProduct(id) {
+        db.collection("products").doc(id).delete();
+    }
+</script>
+
+</body>
+</html>
