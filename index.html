@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FRESH PICK - Premium Grocery</title>
-    
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -72,7 +72,7 @@
             gap: 5px;
             border: 1px solid rgba(255,255,255,0.2);
         }
-        
+
         .points-icon { color: var(--accent); font-size: 16px; }
 
         .search-bar {
@@ -102,12 +102,10 @@
             border-radius: 20px;
             margin-bottom: 25px;
             box-shadow: 0 5px 20px rgba(76, 175, 80, 0.3);
-            position: relative;
-            overflow: hidden;
         }
 
         .promo-banner h2 { font-size: 20px; margin-bottom: 5px; }
-        .promo-banner p { font-size: 13px; opacity: 0.9; margin-bottom: 15px; }
+        .promo-banner p { font-size: 13px; opacity: 0.9; }
 
         .section-header {
             display: flex;
@@ -130,16 +128,17 @@
             padding: 12px;
             box-shadow: var(--shadow);
             transition: var(--transition);
-            position: relative;
             display: flex;
             flex-direction: column;
         }
 
         .product-img {
             width: 100%;
-            height: 100px;
-            object-fit: contain;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 12px;
             margin-bottom: 10px;
+            background: #eee;
         }
 
         .product-name {
@@ -198,6 +197,7 @@
             font-size: 11px;
             font-weight: 600;
             position: relative;
+            cursor: pointer;
         }
 
         .nav-item.active { color: var(--primary-dark); }
@@ -289,7 +289,7 @@
         </div>
         <div class="search-bar">
             <span>🔍</span>
-            <input type="text" placeholder="തിരയുക...">
+            <input type="text" id="searchInput" placeholder="തിരയുക..." onkeyup="filterProducts()">
         </div>
     </header>
 
@@ -346,7 +346,6 @@
     </div>
 
     <script>
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDK_YOTaJf__QlDz_1HASByhR5dV0tvuM4",
             authDomain: "fresh-pick-1346b.firebaseapp.com",
@@ -364,16 +363,16 @@
         let cart = [];
         let points = 0;
 
-        // Firestore-ൽ നിന്ന് ഉൽപ്പന്നങ്ങൾ എടുക്കുന്നു
+        // Firestore Products Fetch
         db.collection("products").onSnapshot((snapshot) => {
             fetchedProducts = [];
             snapshot.forEach(doc => {
                 fetchedProducts.push({ id: doc.id, ...doc.data() });
             });
-            renderProducts();
+            renderProducts(fetchedProducts);
         });
 
-        // Firestore-ൽ നിന്ന് ഓഫറുകൾ എടുക്കുന്നു
+        // Firestore Rewards Fetch
         db.collection("rewards").onSnapshot((snapshot) => {
             fetchedRewards = [];
             snapshot.forEach(doc => {
@@ -381,23 +380,35 @@
             });
         });
 
-        function renderProducts() {
+        function renderProducts(products) {
             const list = document.getElementById('productList');
-            if(fetchedProducts.length === 0) {
-                list.innerHTML = `<p style="grid-column: span 2; text-align: center;">ഉൽപ്പന്നങ്ങൾ ഒന്നും ചേർത്തിട്ടില്ല!</p>`;
+            if(products.length === 0) {
+                list.innerHTML = `<p style="grid-column: span 2; text-align: center; color: #666;">ഉൽപ്പന്നങ്ങൾ ഒന്നും ലഭ്യമല്ല!</p>`;
                 return;
             }
-            list.innerHTML = fetchedProducts.map(p => `
+
+            const defaultImg = "https://i.imgur.com/8uO0MhR.png";
+
+            list.innerHTML = products.map(p => `
                 <div class="product-card">
-                    <img src="${p.img}" alt="${p.name}" class="product-img">
+                    <img src="${p.img ? p.img : defaultImg}" 
+                         alt="${p.name}" 
+                         class="product-img"
+                         onerror="this.src='${defaultImg}'">
                     <div class="product-name">${p.name}</div>
-                    <div class="product-qty">${p.qty}</div>
+                    <div class="product-qty">${p.qty || ''}</div>
                     <div class="product-footer">
                         <div class="product-price">₹${p.price}</div>
                         <button class="add-btn" onclick="addToCart('${p.id}')">+</button>
                     </div>
                 </div>
             `).join('');
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = fetchedProducts.filter(p => p.name.toLowerCase().includes(query));
+            renderProducts(filtered);
         }
 
         function addToCart(id) {
@@ -412,9 +423,13 @@
             document.getElementById('cartTotal').innerText = total;
 
             const cartItemsDiv = document.getElementById('cartItems');
+            if(cart.length === 0) {
+                cartItemsDiv.innerHTML = `<p style="color:#666; text-align:center;">കാർട്ട് കാലിയാണ്</p>`;
+                return;
+            }
             cartItemsDiv.innerHTML = cart.map(item => `
                 <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;">
-                    <span>${item.name}</span>
+                    <span>${item.name} (${item.qty || ''})</span>
                     <strong>₹${item.price}</strong>
                 </div>
             `).join('');
