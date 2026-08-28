@@ -23,10 +23,15 @@
         .location-badge { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
         .points-pill { background: #fff; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 13px; color: #f59e0b; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
 
-        /* Promo Banner */
-        .hero-banner { background: linear-gradient(135deg, #d1fae5, #a7f3d0); padding: 20px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; margin: 15px 20px; box-shadow: 0 10px 20px rgba(16,185,129,0.08); }
-        .hero-title { font-size: 18px; font-weight: 700; color: #065f46; margin-bottom: 5px; }
-        .hero-sub { font-size: 12px; color: #047857; }
+        /* Auto-sliding Banner Slider */
+        .slider-container { margin: 15px 20px; overflow: hidden; border-radius: 20px; box-shadow: 0 10px 20px rgba(16,185,129,0.08); position: relative; }
+        .slider-track { display: flex; transition: transform 0.5s ease-in-out; width: 300%; }
+        .slide { width: 33.333%; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .slide-1 { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
+        .slide-2 { background: linear-gradient(135deg, #ffedd5, #fed7aa); color: #9a3412; }
+        .slide-3 { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); color: #3730a3; }
+        .hero-title { font-size: 18px; font-weight: 700; margin-bottom: 5px; }
+        .hero-sub { font-size: 12px; }
 
         /* Search Bar */
         .search-container { padding: 0 20px; margin-bottom: 15px; }
@@ -41,24 +46,39 @@
         .section-title { padding: 0 20px; font-size: 16px; font-weight: 700; margin-bottom: 12px; }
         .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px; }
         
-        .product-card { background: white; border-radius: 20px; padding: 14px; box-shadow: 0 6px 15px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .product-card { background: white; border-radius: 20px; padding: 14px; box-shadow: 0 6px 15px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; display: flex; flex-direction: column; justify-content: space-between; }
         .product-img { width: 100%; height: 120px; object-fit: cover; border-radius: 14px; margin-bottom: 10px; }
         .product-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
         .product-unit { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
 
-        /* Step Quantity Counter */
+        /* Counter Controls & Add Button */
         .counter-row { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 6px; border-radius: 12px; margin-top: 8px; }
         .btn-step { background: white; border: 1px solid #cbd5e1; width: 28px; height: 28px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .qty-val { font-size: 12px; font-weight: 700; }
         .price-text { font-size: 15px; font-weight: 700; color: var(--primary); }
+        .add-cart-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 8px; border-radius: 10px; font-weight: bold; font-size: 12px; margin-top: 8px; cursor: pointer; }
+
+        /* Views (Cart & Profile Page Views) */
+        .page-view { display: none; padding: 20px; }
+        .page-view.active-view { display: block; }
+
+        /* Cart UI Styling */
+        .cart-item { background: white; padding: 14px; border-radius: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .cart-total-box { background: white; padding: 20px; border-radius: 20px; margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .checkout-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 14px; font-weight: bold; margin-top: 15px; cursor: pointer; font-size: 15px; }
+
+        /* Profile Card */
+        .profile-card { background: white; padding: 20px; border-radius: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .logout-btn { background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer; }
 
         /* Bottom Nav Bar */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
-        .nav-item { text-align: center; font-size: 11px; color: var(--text-muted); text-decoration: none; font-weight: 600; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 99; }
+        .nav-item { text-align: center; font-size: 11px; color: var(--text-muted); text-decoration: none; font-weight: 600; cursor: pointer; position: relative; }
         .nav-item.active { color: var(--primary); }
+        .cart-badge { position: absolute; top: -5px; right: 5px; background: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold; }
 
-        /* Login Modal */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px); }
+        /* Login Modal Screen */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
         .modal-card { background: white; width: 85%; max-width: 360px; padding: 25px; border-radius: 24px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         .modal-card input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 12px; outline: none; font-size: 14px; }
         .modal-card button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; margin-top: 10px; cursor: pointer; }
@@ -69,7 +89,7 @@
 </head>
 <body>
 
-<!-- Mobile Login Popup -->
+<!-- Login Modal Screen -->
 <div id="loginModal" class="modal">
     <div class="modal-card">
         <h3 style="font-size: 18px; margin-bottom: 6px;">FRESH PICK-ലേക്ക് സ്വാഗതം 🌿</h3>
@@ -80,49 +100,99 @@
     </div>
 </div>
 
-<!-- App Header -->
-<div class="app-header">
-    <div class="top-row">
-        <div class="location-badge">📍 <span>Kerala, India</span></div>
-        <div class="points-pill">🏆 <span id="userPoints">0</span> Pts</div>
+<!-- Home Page Screen -->
+<div id="homeView" class="page-view active-view" style="padding:0;">
+    <div class="app-header">
+        <div class="top-row">
+            <div class="location-badge">📍 <span>Kerala, India</span></div>
+            <div class="points-pill">🏆 <span id="userPoints">0</span> Pts</div>
+        </div>
+    </div>
+
+    <!-- Auto Sliding Banner -->
+    <div class="slider-container">
+        <div class="slider-track" id="sliderTrack">
+            <div class="slide slide-1">
+                <div>
+                    <div class="hero-title">Fresh Vegetables & Fruits</div>
+                    <div class="hero-sub">Up to 30% Off Everyday Essentials</div>
+                </div>
+                <span style="font-size: 35px;">🧺</span>
+            </div>
+            <div class="slide slide-2">
+                <div>
+                    <div class="hero-title">Daily Farm Milk & Beverages</div>
+                    <div class="hero-sub">100% Organic & Super Fresh</div>
+                </div>
+                <span style="font-size: 35px;">🥛</span>
+            </div>
+            <div class="slide slide-3">
+                <div>
+                    <div class="hero-title">Flash Deals Today!</div>
+                    <div class="hero-sub">Get Extra Reward Points on Every Order</div>
+                </div>
+                <span style="font-size: 35px;">⚡</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Box -->
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search vegetables, fruits..." onkeyup="renderProducts()">
+    </div>
+
+    <!-- Categories Filter -->
+    <div class="categories-wrapper">
+        <div class="cat-card active" onclick="filterCat('all', this)">All Items</div>
+        <div class="cat-card" onclick="filterCat('offers', this)">Flash Deals 🏷️</div>
+        <div class="cat-card" onclick="filterCat('vegetables', this)">Vegetables 🥦</div>
+        <div class="cat-card" onclick="filterCat('fruits', this)">Fruits 🍎</div>
+        <div class="cat-card" onclick="filterCat('grocery', this)">Grocery 🌾</div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="section-title">Best Selling</div>
+    <div class="products-grid" id="productGrid">
+        <p style="grid-column: span 2; text-align: center;">ലോഡ് ചെയ്യുന്നു...</p>
     </div>
 </div>
 
-<!-- Hero Banner -->
-<div class="hero-banner">
-    <div>
-        <div class="hero-title">Fresh Vegetables & Fruits</div>
-        <div class="hero-sub">Up to 30% Off Everyday Essentials</div>
+<!-- Cart Page Screen -->
+<div id="cartView" class="page-view">
+    <h2 style="margin-bottom: 15px;">നിങ്ങളുടെ കാർട്ട് 🛒</h2>
+    <div id="cartList">കാർട്ട് ശൂന്യമാണ്!</div>
+    
+    <div class="cart-total-box" id="cartSummary" style="display:none;">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 10px;">
+            <span>ആകെ തുക (Total Amount):</span>
+            <strong style="color:var(--primary); font-size: 18px;" id="cartTotal">₹0</strong>
+        </div>
+        <button class="checkout-btn" onclick="checkout()">ഓർഡർ സ്ഥിരീകരിക്കുക (Place Order)</button>
     </div>
-    <span style="font-size: 35px;">🧺</span>
 </div>
 
-<!-- Search -->
-<div class="search-container">
-    <input type="text" id="searchInput" class="search-input" placeholder="Search vegetables, fruits..." onkeyup="renderProducts()">
+<!-- Profile Page Screen -->
+<div id="profileView" class="page-view">
+    <h2 style="margin-bottom: 15px;">മൈ പ്രൊഫൈൽ 👤</h2>
+    <div class="profile-card">
+        <div style="font-size: 40px; margin-bottom: 10px;">👤</div>
+        <h3 id="profileName">User Name</h3>
+        <p id="profilePhone" style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Phone</p>
+        <div style="margin-top: 15px; background: var(--primary-light); padding: 12px; border-radius: 12px; color: var(--primary); font-weight: bold;">
+            🏆 റിവാർഡ് പോയിന്റുകൾ: <span id="profilePoints">0</span>
+        </div>
+        <button class="logout-btn" onclick="logout()">ലോഗ് ഔട്ട് ചെയ്യുക</button>
+    </div>
 </div>
 
-<!-- Categories -->
-<div class="categories-wrapper">
-    <div class="cat-card active" onclick="filterCat('all', this)">All Items</div>
-    <div class="cat-card" onclick="filterCat('offers', this)">Flash Deals 🏷️</div>
-    <div class="cat-card" onclick="filterCat('vegetables', this)">Vegetables 🥦</div>
-    <div class="cat-card" onclick="filterCat('fruits', this)">Fruits 🍎</div>
-    <div class="cat-card" onclick="filterCat('grocery', this)">Grocery 🌾</div>
-</div>
-
-<!-- Products List -->
-<div class="section-title">Best Selling</div>
-<div class="products-grid" id="productGrid">
-    <p style="grid-column: span 2; text-align: center;">ലോഡ് ചെയ്യുന്നു...</p>
-</div>
-
-<!-- Bottom Navigation -->
+<!-- Bottom Navigation Bar -->
 <div class="bottom-nav">
-    <a href="#" class="nav-item active">🏠<br>Home</a>
-    <a href="#" class="nav-item">🗂️<br>Categories</a>
-    <a href="#" class="nav-item">🛒<br>Cart</a>
-    <a href="#" class="nav-item" onclick="logout()">👤<br>Account</a>
+    <div class="nav-item active" onclick="switchTab('home', this)">🏠<br>Home</div>
+    <div class="nav-item" onclick="switchTab('cart', this)">
+        🛒<br>Cart
+        <span class="cart-badge" id="cartCount">0</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('profile', this)">👤<br>Account</div>
 </div>
 
 <script>
@@ -139,9 +209,20 @@
     const db = firebase.firestore();
 
     let allProducts = [];
-    let productQuantities = {}; // { productId: multiplierStep }
+    let productQuantities = {};
+    let cart = [];
     let currentUserPhone = localStorage.getItem("userPhone");
     let currentCategory = "all";
+
+    // Auto Banner Sliding Code
+    let currentSlide = 0;
+    setInterval(() => {
+        const track = document.getElementById("sliderTrack");
+        if(track) {
+            currentSlide = (currentSlide + 1) % 3;
+            track.style.transform = `translateX(-${currentSlide * 33.333}%)`;
+        }
+    }, 3500);
 
     window.onload = function() {
         if(currentUserPhone) {
@@ -182,7 +263,11 @@
     function loadUserData() {
         db.collection("users").doc(currentUserPhone).onSnapshot(doc => {
             if(doc.exists) {
-                document.getElementById("userPoints").innerText = doc.data().points || 0;
+                const data = doc.data();
+                document.getElementById("userPoints").innerText = data.points || 0;
+                document.getElementById("profilePoints").innerText = data.points || 0;
+                document.getElementById("profileName").innerText = data.name || "Customer";
+                document.getElementById("profilePhone").innerText = data.phone;
             }
         });
     }
@@ -194,6 +279,7 @@
         }
     }
 
+    // Load Products
     db.collection("products").onSnapshot(snapshot => {
         allProducts = [];
         snapshot.forEach(doc => {
@@ -220,7 +306,7 @@
 
         filtered.forEach(p => {
             if(!productQuantities[p.id]) {
-                productQuantities[p.id] = 1; // Default step is 1 multiplier
+                productQuantities[p.id] = 1;
             }
 
             const currentMultiplier = productQuantities[p.id];
@@ -240,12 +326,13 @@
                         <span class="qty-val">${unitLabel}</span>
                         <button class="btn-step" onclick="changeQty('${p.id}', 1)">+</button>
                     </div>
+
+                    <button class="add-cart-btn" onclick="addToCart('${p.id}')">Add to Cart 🛒</button>
                 </div>
             `;
         });
     }
 
-    // Dynamic Step Calculation based on Admin Setting
     function changeQty(productId, delta) {
         if(productQuantities[productId] + delta >= 1) {
             productQuantities[productId] += delta;
@@ -283,6 +370,94 @@
         else if(minUnit === "500g") singleStepPrice = basePrice * 0.5;
         
         return Math.round(singleStepPrice * multiplier);
+    }
+
+    // CART SYSTEM LOGIC
+    function addToCart(productId) {
+        const prod = allProducts.find(p => p.id === productId);
+        const mult = productQuantities[productId] || 1;
+        const price = calculateStepPrice(prod.minUnit, prod.price, mult);
+        const qtyText = getFormattedQtyLabel(prod.minUnit, mult);
+
+        const existingIndex = cart.findIndex(item => item.id === productId);
+
+        if(existingIndex > -1) {
+            cart[existingIndex].qtyText = qtyText;
+            cart[existingIndex].price = price;
+        } else {
+            cart.push({
+                id: prod.id,
+                name: prod.name,
+                price: price,
+                qtyText: qtyText,
+                img: prod.img
+            });
+        }
+
+        updateCartUI();
+        alert(`${prod.name} കാർട്ടിലേക്ക് ചേർത്തു! 🛒`);
+    }
+
+    function updateCartUI() {
+        document.getElementById("cartCount").innerText = cart.length;
+        const cartList = document.getElementById("cartList");
+        const cartSummary = document.getElementById("cartSummary");
+
+        if(cart.length === 0) {
+            cartList.innerHTML = `<p style="text-align:center; color:#888;">കാർട്ട് ശൂന്യമാണ്!</p>`;
+            cartSummary.style.display = "none";
+            return;
+        }
+
+        cartList.innerHTML = "";
+        let total = 0;
+
+        cart.forEach((item, index) => {
+            total += item.price;
+            cartList.innerHTML += `
+                <div class="cart-item">
+                    <img src="${item.img}" style="width:50px; height:50px; border-radius:10px; object-fit:cover;">
+                    <div style="flex-grow:1; margin-left:12px;">
+                        <strong>${item.name}</strong><br>
+                        <small style="color:#64748b;">${item.qtyText}</small>
+                    </div>
+                    <div style="text-align:right;">
+                        <strong style="color:var(--primary);">₹${item.price}</strong><br>
+                        <small style="color:#ef4444; cursor:pointer;" onclick="removeFromCart(${index})">Remove</small>
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById("cartTotal").innerText = `₹${total}`;
+        cartSummary.style.display = "block";
+    }
+
+    function removeFromCart(index) {
+        cart.splice(index, 1);
+        updateCartUI();
+    }
+
+    function checkout() {
+        alert("ഓർഡർ വിജയിച്ചു! 🚀 അഡ്മിൻ പാനലിൽ വിവരം അയച്ചിട്ടുണ്ട്.");
+        cart = [];
+        updateCartUI();
+        switchTab('home', document.querySelectorAll('.nav-item')[0]);
+    }
+
+    // Tab Navigation Switcher
+    function switchTab(tabName, element) {
+        document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active-view'));
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+
+        element.classList.add('active');
+
+        if(tabName === 'home') document.getElementById('homeView').classList.add('active-view');
+        if(tabName === 'cart') {
+            document.getElementById('cartView').classList.add('active-view');
+            updateCartUI();
+        }
+        if(tabName === 'profile') document.getElementById('profileView').classList.add('active-view');
     }
 
     function filterCat(cat, element) {
