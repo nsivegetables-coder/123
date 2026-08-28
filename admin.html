@@ -2,72 +2,121 @@
 <html lang="ml">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fresh Pick - Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f6f8; }
-        .card { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        input, select, button { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
-        button { background: #10b981; color: white; border: none; font-weight: bold; cursor: pointer; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
+        body { background: #f8fafc; color: #0f172a; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        .card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 25px; border: 1px solid #e2e8f0; }
+        h2 { margin-bottom: 15px; color: #10b981; }
+        h3 { font-size: 16px; margin-bottom: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #64748b; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 10px; outline: none; font-size: 14px; }
+        button { background: #10b981; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 14px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th, td { border-bottom: 1px solid #e2e8f0; padding: 10px; text-align: left; font-size: 13px; }
+        th { color: #64748b; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-<h2>ADMIN CONTROL PANEL</h2>
+<div class="container">
+    <h2>Fresh Pick - Admin Control Panel</h2>
 
-<!-- Add Category Section -->
-<div class="card">
-    <h3>Add Category with Logo Icon</h3>
-    <input type="text" id="catName" placeholder="Category Name (eg: Vegetables)">
-    <input type="text" id="catLogo" placeholder="Logo PNG Image URL">
-    <button onclick="addCategory()">Add Category</button>
-</div>
+    <!-- Add Category -->
+    <div class="card">
+        <h3>1. Add Category with Logo</h3>
+        <div class="form-group">
+            <label>Category Name (eg: Fruits)</label>
+            <input type="text" id="catName" placeholder="Category Name">
+        </div>
+        <div class="form-group">
+            <label>Logo PNG URL</label>
+            <input type="text" id="catLogo" placeholder="https://cdn-icons-png.flaticon.com/...">
+        </div>
+        <button onclick="addCategory()">Add Category</button>
+    </div>
 
-<!-- Add/Manage Product Stock Section -->
-<div class="card">
-    <h3>Add Product & Stock</h3>
-    <input type="text" id="pName" placeholder="Product Name (eg: Tomato)">
-    <input type="number" id="pPrice" placeholder="Price per kg">
-    <input type="number" id="pStock" placeholder="Total Stock (in kg) eg: 50">
-    <input type="text" id="pImg" placeholder="Image URL">
-    
-    <label>Category:</label>
-    <select id="pCat"></select>
-    
-    <label>Status:</label>
-    <select id="pStatus">
-        <option value="available">Available (In Stock)</option>
-        <option value="out">Out of Stock</option>
-        <option value="coming">Coming Soon</option>
-    </select>
-    
-    <button onclick="addProduct()">Save Product</button>
-</div>
+    <!-- Add Product & Stock -->
+    <div class="card">
+        <h3>2. Add Product & Initial Stock</h3>
+        <div class="form-group">
+            <label>Product Name</label>
+            <input type="text" id="pName" placeholder="eg: Tomato">
+        </div>
+        <div class="form-group">
+            <label>Category</label>
+            <select id="pCat"></select>
+        </div>
+        <div class="form-group">
+            <label>Base Unit</label>
+            <select id="pUnit">
+                <option value="1kg">1 kg</option>
+                <option value="500g">500 g</option>
+                <option value="250g">250 g</option>
+                <option value="100g">100 g</option>
+                <option value="1pc">1 Pc</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Price (₹)</label>
+            <input type="number" id="pPrice" placeholder="Price">
+        </div>
+        <div class="form-group">
+            <label>Total Stock (in kg or Quantity)</label>
+            <input type="number" id="pStock" placeholder="eg: 50">
+        </div>
+        <div class="form-group">
+            <label>Product Image URL</label>
+            <input type="text" id="pImg" placeholder="Image URL">
+        </div>
+        <div class="form-group">
+            <label>Status</label>
+            <select id="pStatus">
+                <option value="available">Available (In Stock)</option>
+                <option value="out">Out of Stock</option>
+                <option value="coming">Coming Soon</option>
+            </select>
+        </div>
+        <button onclick="addProduct()">Save Product</button>
+    </div>
 
-<div class="card">
-    <h3>Product Stock & Status List</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Stock (kg)</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="adminProdTable"></tbody>
-    </table>
+    <!-- Stock Management Table -->
+    <div class="card">
+        <h3>3. Product Stock & Status Control</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Stock (Kg/Qty)</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="adminProdTable"></tbody>
+        </table>
+    </div>
 </div>
 
 <script>
-    const firebaseConfig = { apiKey: "AIzaSyDK_YOTaJf__QlDz_1HASByhR5dV0tvuM4", authDomain: "fresh-pick-1346b.firebaseapp.com", projectId: "fresh-pick-1346b", storageBucket: "fresh-pick-1346b.firebasestorage.app", messagingSenderId: "266778456541", appId: "1:266778456541:web:246305a1c69535c8efc634" };
+    const firebaseConfig = {
+        apiKey: "AIzaSyDK_YOTaJf__QlDz_1HASByhR5dV0tvuM4",
+        authDomain: "fresh-pick-1346b.firebaseapp.com",
+        projectId: "fresh-pick-1346b",
+        storageBucket: "fresh-pick-1346b.firebasestorage.app",
+        messagingSenderId: "266778456541",
+        appId: "1:266778456541:web:246305a1c69535c8efc634"
+    };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Load Categories
+    // Load Dynamic Categories into Dropdown
     db.collection("categories").onSnapshot(snap => {
         const select = document.getElementById("pCat");
         select.innerHTML = "";
@@ -84,40 +133,45 @@
             const p = doc.data();
             table.innerHTML += `
                 <tr>
-                    <td>${p.name}</td>
-                    <td><input type="number" value="${p.stockKg}" onchange="updateStock('${doc.id}', this.value)"></td>
+                    <td><strong>${p.name}</strong></td>
+                    <td><input type="number" value="${p.stockKg || 0}" style="width:70px;" onchange="updateStock('${doc.id}', this.value)"></td>
                     <td>
-                        <select onchange="updateStatus('${doc.id}', this.value)">
+                        <select onchange="updateStatus('${doc.id}', this.value)" style="padding:4px;">
                             <option value="available" ${p.status==='available'?'selected':''}>Available</option>
                             <option value="out" ${p.status==='out'?'selected':''}>Out of Stock</option>
                             <option value="coming" ${p.status==='coming'?'selected':''}>Coming Soon</option>
                         </select>
                     </td>
-                    <td><button style="background:red;" onclick="deleteProd('${doc.id}')">Delete</button></td>
+                    <td><button style="background:#ef4444; padding:6px 10px; width:auto;" onclick="deleteProd('${doc.id}')">Delete</button></td>
                 </tr>
             `;
         });
     });
 
     async function addCategory() {
-        const name = document.getElementById("catName").value;
-        const logo = document.getElementById("catLogo").value;
+        const name = document.getElementById("catName").value.trim();
+        const logo = document.getElementById("catLogo").value.trim();
         if(name && logo) {
             await db.collection("categories").add({ name, logo });
             alert("Category Added!");
+            document.getElementById("catName").value = "";
+            document.getElementById("catLogo").value = "";
         }
     }
 
     async function addProduct() {
-        const name = document.getElementById("pName").value;
+        const name = document.getElementById("pName").value.trim();
+        const category = document.getElementById("pCat").value;
+        const minUnit = document.getElementById("pUnit").value;
         const price = Number(document.getElementById("pPrice").value);
         const stockKg = Number(document.getElementById("pStock").value);
-        const img = document.getElementById("pImg").value;
-        const category = document.getElementById("pCat").value;
+        const img = document.getElementById("pImg").value.trim();
         const status = document.getElementById("pStatus").value;
 
-        await db.collection("products").add({ name, price, stockKg, img, category, status });
-        alert("Product Saved!");
+        if(name && price) {
+            await db.collection("products").add({ name, category, minUnit, price, stockKg, img, status });
+            alert("Product Added!");
+        }
     }
 
     function updateStock(id, newStock) {
@@ -132,7 +186,9 @@
     }
 
     function deleteProd(id) {
-        db.collection("products").doc(id).delete();
+        if(confirm("Delete this product?")) {
+            db.collection("products").doc(id).delete();
+        }
     }
 </script>
 </body>
