@@ -2,267 +2,138 @@
 <html lang="ml">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FRESH PICK - Admin Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Admin Dashboard</title>
     <style>
-        :root {
-            --primary: #10b981;
-            --primary-dark: #059669;
-            --bg: #f8fafc;
-            --text-main: #0f172a;
-        }
-        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
-        body { background: var(--bg); padding: 15px; color: var(--text-main); }
-        .container { max-width: 750px; margin: 0 auto; }
-        .header { background: linear-gradient(135deg, #10b981, #047857); color: white; padding: 25px; border-radius: 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(16,185,129,0.2); }
-        
-        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: white; padding: 18px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .stat-card h3 { font-size: 24px; color: var(--primary); margin-top: 5px; }
-
-        .form-section { background: white; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0; margin-bottom: 25px; }
-        .form-group { margin-bottom: 12px; }
-        label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 5px; color: #475569; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; }
-        .row { display: flex; gap: 10px; }
-        .row > div { flex: 1; }
-        
-        .file-upload-box { border: 2px dashed #a7f3d0; padding: 15px; text-align: center; border-radius: 12px; background: #ecfdf5; cursor: pointer; display: block; }
-        .file-upload-box input[type="file"] { display: none; }
-        .preview-img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; margin-top: 10px; display: none; }
-
-        button { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; width: 100%; font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        button:hover { background: var(--primary-dark); }
-
-        .product-card { background: white; padding: 12px 16px; border-radius: 14px; margin-top: 10px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #e2e8f0; }
-        .product-img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; margin-right: 12px; }
-        .delete-btn { background: #ef4444; width: auto; padding: 6px 12px; font-size: 12px; }
-
-        .user-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-        .user-table th, .user-table td { border-bottom: 1px solid #f1f5f9; padding: 10px; text-align: left; }
-        .user-table th { background: #f8fafc; color: #64748b; }
+        body { font-family: sans-serif; padding: 20px; background: #f4f6f8; }
+        .card { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input, select, button { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+        button { background: #10b981; color: white; border: none; font-weight: bold; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
     </style>
-    
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h2>FRESH PICK - Admin Dashboard 🛠️</h2>
-        <p style="font-size: 13px; opacity: 0.9; margin-top: 4px;">യൂസർ ഹിസ്റ്ററി & പ്രോഡക്റ്റ് മാനേജ്‌മെന്റ്</p>
-    </div>
+<h2>ADMIN CONTROL PANEL</h2>
 
-    <div class="stats-row">
-        <div class="stat-card">
-            <span style="font-size: 12px; color: #64748b;">രജിസ്റ്റർ ചെയ്ത യൂസേഴ്സ്</span>
-            <h3 id="totalUsers">0</h3>
-        </div>
-        <div class="stat-card">
-            <span style="font-size: 12px; color: #64748b;">ആകെ പ്രോഡക്റ്റുകൾ</span>
-            <h3 id="totalProducts">0</h3>
-        </div>
-    </div>
+<!-- Add Category Section -->
+<div class="card">
+    <h3>Add Category with Logo Icon</h3>
+    <input type="text" id="catName" placeholder="Category Name (eg: Vegetables)">
+    <input type="text" id="catLogo" placeholder="Logo PNG Image URL">
+    <button onclick="addCategory()">Add Category</button>
+</div>
 
-    <!-- User Login History Table -->
-    <div class="form-section">
-        <h3 style="font-size: 16px; margin-bottom: 10px; color: #0f172a;">👥 യൂസർ ലോഗിൻ ഹിസ്റ്ററി & പോയിന്റുകൾ</h3>
-        <table class="user-table">
-            <thead>
-                <tr>
-                    <th>പേര് / നമ്പർ</th>
-                    <th>രജിസ്റ്റർ ചെയ്ത സമയം</th>
-                    <th>പോയിന്റുകൾ</th>
-                </tr>
-            </thead>
-            <tbody id="usersTableBody">
-                <tr><td colspan="3">ലോഡ് ചെയ്യുന്നു...</td></tr>
-            </tbody>
-        </table>
-    </div>
+<!-- Add/Manage Product Stock Section -->
+<div class="card">
+    <h3>Add Product & Stock</h3>
+    <input type="text" id="pName" placeholder="Product Name (eg: Tomato)">
+    <input type="number" id="pPrice" placeholder="Price per kg">
+    <input type="number" id="pStock" placeholder="Total Stock (in kg) eg: 50">
+    <input type="text" id="pImg" placeholder="Image URL">
+    
+    <label>Category:</label>
+    <select id="pCat"></select>
+    
+    <label>Status:</label>
+    <select id="pStatus">
+        <option value="available">Available (In Stock)</option>
+        <option value="out">Out of Stock</option>
+        <option value="coming">Coming Soon</option>
+    </select>
+    
+    <button onclick="addProduct()">Save Product</button>
+</div>
 
-    <!-- Product Adding Form -->
-    <div class="form-section">
-        <h3 style="margin-bottom: 15px; color: var(--primary-dark); font-size: 16px;">പുതിയ പ്രോഡക്റ്റ് ചേർക്കുക</h3>
-        
-        <div class="form-group">
-            <label>ഉൽപ്പന്നത്തിന്റെ പേര്</label>
-            <input type="text" id="pName" placeholder="ഉദാ: Avocado / തക്കാളി">
-        </div>
-
-        <div class="row">
-            <div class="form-group">
-                <label>കാറ്റഗറി</label>
-                <select id="pCategory">
-                    <option value="vegetables">Vegetables 🥦</option>
-                    <option value="fruits">Fruits 🍎</option>
-                    <option value="grocery">Grocery 🌾</option>
-                    <option value="beverages">Beverages 🥤</option>
-                    <option value="offers">Flash Deals 🏷️</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>അളവ് ടൈപ്പ് (Unit)</label>
-                <select id="pMinUnit">
-                    <option value="50g">50 Grams (Weight)</option>
-                    <option value="100g">100 Grams (Weight)</option>
-                    <option value="250g">250 Grams (Weight)</option>
-                    <option value="500g">500 Grams (Weight)</option>
-                    <option value="1kg">1 Kg (Weight)</option>
-                    <option value="1pc">1 Piece / Pkt (Count)</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label>1 Kg അല്ലെങ്കിൽ 1 Piece-ന്റെ ബേസ് വില (₹)</label>
-            <input type="number" id="pPrice" placeholder="ഉദാ: 100">
-        </div>
-
-        <div class="form-group">
-            <label>ഫോട്ടോ സെലക്ട് ചെയ്യുക</label>
-            <label class="file-upload-box">
-                <span>📸 ഫോട്ടോ തിരഞ്ഞെടുക്കാൻ ക്ലിക്ക് ചെയ്യുക</span>
-                <input type="file" id="pImgFile" accept="image/*" onchange="previewAndCompress(event)">
-            </label>
-            <center><img id="imgPreview" class="preview-img"></center>
-        </div>
-        
-        <button id="saveBtn" onclick="addProduct()">Save Product</button>
-    </div>
-
-    <h3 style="margin-bottom: 10px; font-size: 16px;">നിലവിലുള്ള പ്രോഡക്റ്റുകൾ</h3>
-    <div id="adminProductList">ലോഡ് ചെയ്യുന്നു...</div>
+<div class="card">
+    <h3>Product Stock & Status List</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Stock (kg)</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="adminProdTable"></tbody>
+    </table>
 </div>
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyDK_YOTaJf__QlDz_1HASByhR5dV0tvuM4",
-        authDomain: "fresh-pick-1346b.firebaseapp.com",
-        projectId: "fresh-pick-1346b",
-        storageBucket: "fresh-pick-1346b.firebasestorage.app",
-        messagingSenderId: "266778456541",
-        appId: "1:266778456541:web:246305a1c69535c8efc634"
-    };
-
+    const firebaseConfig = { apiKey: "AIzaSyDK_YOTaJf__QlDz_1HASByhR5dV0tvuM4", authDomain: "fresh-pick-1346b.firebaseapp.com", projectId: "fresh-pick-1346b", storageBucket: "fresh-pick-1346b.firebasestorage.app", messagingSenderId: "266778456541", appId: "1:266778456541:web:246305a1c69535c8efc634" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    let base64ImageString = "";
+    // Load Categories
+    db.collection("categories").onSnapshot(snap => {
+        const select = document.getElementById("pCat");
+        select.innerHTML = "";
+        snap.forEach(doc => {
+            select.innerHTML += `<option value="${doc.data().name}">${doc.data().name}</option>`;
+        });
+    });
 
-    function previewAndCompress(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = function() {
-                    const canvas = document.createElement("canvas");
-                    const MAX_WIDTH = 300;
-                    const scaleFactor = MAX_WIDTH / img.width;
-                    canvas.width = MAX_WIDTH;
-                    canvas.height = img.height * scaleFactor;
-                    const ctx = canvas.getContext("2d");
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    base64ImageString = canvas.toDataURL("image/jpeg", 0.7);
+    // Load Products Table
+    db.collection("products").onSnapshot(snap => {
+        const table = document.getElementById("adminProdTable");
+        table.innerHTML = "";
+        snap.forEach(doc => {
+            const p = doc.data();
+            table.innerHTML += `
+                <tr>
+                    <td>${p.name}</td>
+                    <td><input type="number" value="${p.stockKg}" onchange="updateStock('${doc.id}', this.value)"></td>
+                    <td>
+                        <select onchange="updateStatus('${doc.id}', this.value)">
+                            <option value="available" ${p.status==='available'?'selected':''}>Available</option>
+                            <option value="out" ${p.status==='out'?'selected':''}>Out of Stock</option>
+                            <option value="coming" ${p.status==='coming'?'selected':''}>Coming Soon</option>
+                        </select>
+                    </td>
+                    <td><button style="background:red;" onclick="deleteProd('${doc.id}')">Delete</button></td>
+                </tr>
+            `;
+        });
+    });
 
-                    const preview = document.getElementById("imgPreview");
-                    preview.src = base64ImageString;
-                    preview.style.display = "block";
-                };
-            };
-            reader.readAsDataURL(file);
+    async function addCategory() {
+        const name = document.getElementById("catName").value;
+        const logo = document.getElementById("catLogo").value;
+        if(name && logo) {
+            await db.collection("categories").add({ name, logo });
+            alert("Category Added!");
         }
     }
 
     async function addProduct() {
-        const name = document.getElementById('pName').value;
-        const category = document.getElementById('pCategory').value;
-        const minUnit = document.getElementById('pMinUnit').value;
-        const price = Number(document.getElementById('pPrice').value);
-        const btn = document.getElementById('saveBtn');
+        const name = document.getElementById("pName").value;
+        const price = Number(document.getElementById("pPrice").value);
+        const stockKg = Number(document.getElementById("pStock").value);
+        const img = document.getElementById("pImg").value;
+        const category = document.getElementById("pCat").value;
+        const status = document.getElementById("pStatus").value;
 
-        if (!name || !price) {
-            alert('പേരും വിലയും നൽകുക!');
-            return;
-        }
-
-        const defaultImg = "https://i.imgur.com/8uO0MhR.png";
-        const finalImg = base64ImageString ? base64ImageString : defaultImg;
-
-        btn.innerText = "സേവ് ചെയ്യുന്നു... ⏳";
-        btn.disabled = true;
-
-        try {
-            await db.collection("products").add({
-                name: name,
-                category: category,
-                minUnit: minUnit,
-                price: price,
-                img: finalImg,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-
-            alert("പ്രോഡക്റ്റ് വിജയകരമായി ചേർത്തു!");
-            document.getElementById('pName').value = '';
-            document.getElementById('pPrice').value = '';
-            document.getElementById('imgPreview').style.display = 'none';
-            base64ImageString = "";
-        } catch (error) {
-            alert("Error: " + error.message);
-        } finally {
-            btn.innerText = "Save Product";
-            btn.disabled = false;
-        }
+        await db.collection("products").add({ name, price, stockKg, img, category, status });
+        alert("Product Saved!");
     }
 
-    // Load User History & Points
-    db.collection("users").orderBy("createdAt", "desc").onSnapshot(snapshot => {
-        const tbody = document.getElementById("usersTableBody");
-        document.getElementById("totalUsers").innerText = snapshot.size;
-        tbody.innerHTML = "";
-        snapshot.forEach(doc => {
-            const u = doc.data();
-            const dateStr = u.createdAt ? new Date(u.createdAt.toDate()).toLocaleDateString('en-IN', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : 'N/A';
-            tbody.innerHTML += `
-                <tr>
-                    <td><strong>${u.name || 'User'}</strong><br><small style="color:#64748b;">${u.phone}</small></td>
-                    <td>${dateStr}</td>
-                    <td><span style="color:#10b981; font-weight:bold;">🏆 ${u.points || 0} Pts</span></td>
-                </tr>
-            `;
+    function updateStock(id, newStock) {
+        db.collection("products").doc(id).update({ 
+            stockKg: Number(newStock),
+            status: Number(newStock) <= 0 ? 'out' : 'available'
         });
-    });
+    }
 
-    // Load Products
-    db.collection("products").onSnapshot((snapshot) => {
-        const list = document.getElementById('adminProductList');
-        document.getElementById('totalProducts').innerText = snapshot.size;
-        list.innerHTML = "";
-        snapshot.forEach((doc) => {
-            const p = doc.data();
-            list.innerHTML += `
-                <div class="product-card">
-                    <img src="${p.img}" class="product-img">
-                    <div style="flex-grow:1;">
-                        <strong>${p.name}</strong> <small>(${p.category})</small><br>
-                        <span style="color:var(--primary); font-weight:bold;">₹${p.price}</span> / min: ${p.minUnit}
-                    </div>
-                    <button class="delete-btn" onclick="deleteProduct('${doc.id}')">Delete</button>
-                </div>
-            `;
-        });
-    });
+    function updateStatus(id, newStatus) {
+        db.collection("products").doc(id).update({ status: newStatus });
+    }
 
-    function deleteProduct(id) {
-        if (confirm("ഡിലീറ്റ് ചെയ്യണോ?")) {
-            db.collection("products").doc(id).delete();
-        }
+    function deleteProd(id) {
+        db.collection("products").doc(id).delete();
     }
 </script>
-
 </body>
 </html>
