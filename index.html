@@ -11,8 +11,13 @@
         body { background: var(--bg); color: var(--text-dark); padding-bottom: 90px; }
 
         .app-header { background: #f1f8f5; padding: 20px 20px 10px 20px; border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; }
-        .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .points-pill { background: #fff; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 13px; color: #f59e0b; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+
+        /* Banner Slider */
+        .slider-container { padding: 10px 20px 0; overflow: hidden; position: relative; }
+        .slider-wrapper { display: flex; transition: transform 0.5s ease-in-out; border-radius: 16px; }
+        .slide-img { width: 100%; flex-shrink: 0; height: 140px; object-fit: cover; border-radius: 16px; }
 
         .search-container { padding: 15px 20px 0; }
         .search-input { width: 100%; padding: 14px 18px; border: none; background: white; border-radius: 16px; font-size: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); outline: none; }
@@ -32,29 +37,23 @@
         .product-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
         .product-unit { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
 
-        .badge-status { position: absolute; top: 20px; left: 20px; background: rgba(239, 68, 68, 0.95); color: white; font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: bold; }
-        .badge-coming { background: rgba(245, 158, 11, 0.95); }
-
         .counter-row { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 6px; border-radius: 12px; margin-top: 8px; }
         .btn-step { background: white; border: 1px solid #cbd5e1; width: 28px; height: 28px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .price-text { font-size: 15px; font-weight: 700; color: var(--primary); }
         .add-cart-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 12px; margin-top: 8px; cursor: pointer; }
-        .add-cart-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
 
         .page-view { display: none; padding: 20px; }
         .page-view.active-view { display: block; }
-        .cart-item { background: white; padding: 14px; border-radius: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-        .checkout-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 14px; font-weight: bold; margin-top: 15px; cursor: pointer; font-size: 15px; }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 99; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-around: space-around; padding: 12px 0; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 99; }
         .nav-item { text-align: center; font-size: 11px; color: var(--text-muted); font-weight: 600; cursor: pointer; position: relative; }
         .nav-item.active { color: var(--primary); }
         .cart-badge { position: absolute; top: -5px; right: 5px; background: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold; }
 
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
         .modal-card { background: white; width: 85%; max-width: 360px; padding: 25px; border-radius: 24px; text-align: center; }
-        .modal-card input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 12px; outline: none; font-size: 14px; }
-        .modal-card button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; margin-top: 10px; cursor: pointer; }
+        .modal-card input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 12px; outline: none; }
+        .modal-card button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -63,11 +62,10 @@
 
 <div id="loginModal" class="modal">
     <div class="modal-card">
-        <h3>FRESH PICK-ലേക്ക് സ്വാഗതം 🌿</h3>
-        <p style="font-size: 12px; color: var(--text-muted); margin: 6px 0 12px;">ലോഗിൻ ചെയ്യാൻ വിവരങ്ങൾ നൽകുക</p>
-        <input type="text" id="userName" placeholder="നിങ്ങളുടെ പേര്">
+        <h3>FRESH PICK 🌿</h3>
+        <input type="text" id="userName" placeholder="പേര്">
         <input type="tel" id="userPhone" placeholder="മൊബൈൽ നമ്പർ">
-        <button onclick="loginUser()">ലോഗിൻ ചെയ്യുക</button>
+        <button onclick="loginUser()">ലോഗിൻ</button>
     </div>
 </div>
 
@@ -79,6 +77,11 @@
         </div>
     </div>
 
+    <!-- Auto-Sliding Ads Section -->
+    <div class="slider-container" id="sliderContainer" style="display:none;">
+        <div class="slider-wrapper" id="sliderWrapper"></div>
+    </div>
+
     <div class="search-container">
         <input type="text" id="searchInput" class="search-input" placeholder="Search products..." onkeyup="renderProducts()">
     </div>
@@ -87,34 +90,23 @@
         <div class="categories-scroll" id="catContainer"></div>
     </div>
 
-    <div class="section-title">Best Selling</div>
+    <div class="section-title">Products</div>
     <div class="products-grid" id="productGrid"></div>
 </div>
 
 <div id="cartView" class="page-view">
-    <h2 style="margin-bottom: 15px;">നിങ്ങളുടെ കാർട്ട് 🛒</h2>
-    <div id="cartList">കാർട്ട് ശൂന്യമാണ്!</div>
-    
-    <div id="cartSummary" style="display:none; background:white; padding:20px; border-radius:20px; margin-top:20px;">
-        <div style="display:flex; justify-content:space-between; margin-bottom: 10px;">
-            <span>ആകെ തുക:</span>
-            <strong style="color:var(--primary); font-size: 18px;" id="cartTotal">₹0</strong>
-        </div>
-        <button class="checkout-btn" onclick="checkout()">ഓർഡർ ചെയ്യുക (Place Order)</button>
-    </div>
+    <h2>കാർട്ട് 🛒</h2>
+    <div id="cartList" style="margin-top:15px;">കാർട്ട് ശൂന്യമാണ്!</div>
+    <button onclick="checkout()" class="add-cart-btn" style="padding:15px; margin-top:20px; font-size:15px;">Order Now</button>
 </div>
 
 <div id="profileView" class="page-view">
     <h2>മൈ പ്രൊഫൈൽ 👤</h2>
     <div style="background:white; padding:20px; border-radius:20px; text-align:center; margin-top:15px;">
         <h3 id="profileName">User</h3>
-        <p id="profilePhone" style="color:var(--text-muted); font-size:14px; margin-top:4px;">Phone</p>
+        <p id="profilePhone" style="color:var(--text-muted);">Phone</p>
         <div style="margin-top:15px; background:var(--primary-light); padding:15px; border-radius:12px; color:var(--primary); font-weight:bold;">
             🏆 പോയിന്റുകൾ: <span id="profilePoints">0</span>
-        </div>
-        <div style="margin-top:20px; text-align:left;">
-            <h4>🎁 Available Rewards Gifts</h4>
-            <div id="giftList" style="margin-top:10px; font-size:13px; color:#555;">ലഭ്യമായ ഗിഫ്റ്റുകൾ ഇവിടെ കാണാം...</div>
         </div>
         <button onclick="logout()" style="background:#ef4444; color:white; border:none; padding:10px 20px; border-radius:10px; font-weight:bold; margin-top:20px; cursor:pointer;">Logout</button>
     </div>
@@ -122,10 +114,7 @@
 
 <div class="bottom-nav">
     <div class="nav-item active" onclick="switchTab('home', this)">🏠<br>Home</div>
-    <div class="nav-item" onclick="switchTab('cart', this)">
-        🛒<br>Cart
-        <span class="cart-badge" id="cartCount">0</span>
-    </div>
+    <div class="nav-item" onclick="switchTab('cart', this)">🛒<br>Cart <span class="cart-badge" id="cartCount">0</span></div>
     <div class="nav-item" onclick="switchTab('profile', this)">👤<br>Account</div>
 </div>
 
@@ -144,28 +133,59 @@
     let allProducts = [], productQuantities = {}, cart = [];
     let currentUserPhone = localStorage.getItem("userPhone");
     let currentCategory = "all";
+    let slideIndex = 0;
 
     window.onload = function() {
         if(currentUserPhone) {
             document.getElementById("loginModal").style.display = "none";
             loadUserData();
         }
-        loadGifts();
+        loadRunningAds();
+    }
+
+    // Auto-sliding Banner Ads Loader
+    function loadRunningAds() {
+        const now = Date.now();
+        db.collection("ads").onSnapshot(snap => {
+            const wrapper = document.getElementById("sliderWrapper");
+            wrapper.innerHTML = "";
+            let count = 0;
+
+            snap.forEach(doc => {
+                const ad = doc.data();
+                // Check if Ad timer is still valid
+                if (ad.expiryTime > now) {
+                    wrapper.innerHTML += `<img src="${ad.image}" class="slide-img">`;
+                    count++;
+                }
+            });
+
+            if(count > 0) {
+                document.getElementById("sliderContainer").style.display = "block";
+                startAutoSlide(count);
+            } else {
+                document.getElementById("sliderContainer").style.display = "none";
+            }
+        });
+    }
+
+    function startAutoSlide(totalSlides) {
+        setInterval(() => {
+            slideIndex = (slideIndex + 1) % totalSlides;
+            document.getElementById("sliderWrapper").style.transform = `translateX(-${slideIndex * 100}%)`;
+        }, 3000); // 3 seconds per slide
     }
 
     async function loginUser() {
         const name = document.getElementById("userName").value.trim();
         const phone = document.getElementById("userPhone").value.trim();
-        if(phone.length < 10) return alert("ഫോൺ നമ്പർ ശരിയല്ല!");
+        if(phone.length < 10) return alert("ഫോൺ നമ്പർ തെറ്റാണ്!");
 
         currentUserPhone = phone;
         localStorage.setItem("userPhone", phone);
-
         const uRef = db.collection("users").doc(phone);
         const doc = await uRef.get();
-        if(!doc.exists()) {
-            await uRef.set({ name: name || "Customer", phone: phone, points: 0 });
-        }
+        if(!doc.exists()) await uRef.set({ name: name || "Customer", phone: phone, points: 0 });
         document.getElementById("loginModal").style.display = "none";
         loadUserData();
     }
@@ -176,20 +196,9 @@
                 const d = doc.data();
                 document.getElementById("userPoints").innerText = d.points || 0;
                 document.getElementById("profilePoints").innerText = d.points || 0;
-                document.getElementById("profileName").innerText = d.name || "Customer";
+                document.getElementById("profileName").innerText = d.name;
                 document.getElementById("profilePhone").innerText = d.phone;
             }
-        });
-    }
-
-    function loadGifts() {
-        db.collection("rewards").onSnapshot(snap => {
-            const list = document.getElementById("giftList");
-            list.innerHTML = "";
-            snap.forEach(doc => {
-                const g = doc.data();
-                list.innerHTML += `<div style="background:#f1f5f9; padding:8px; border-radius:8px; margin-bottom:5px;"><strong>${g.giftName}</strong> - Need ${g.requiredPoints} Points</div>`;
-            });
         });
     }
 
@@ -202,8 +211,7 @@
     });
 
     function renderCategories(cats) {
-        const container = document.getElementById("catContainer");
-        container.innerHTML = cats.map(cat => `
+        document.getElementById("catContainer").innerHTML = cats.map(cat => `
             <div class="cat-item ${currentCategory === cat.name || (currentCategory==='all'&&cat.id==='all') ? 'active':''}" onclick="filterCat('${cat.id==='all'?'all':cat.name}')">
                 <div class="cat-circle"><img src="${cat.logo}"></div>
                 <span class="cat-label">${cat.name}</span>
@@ -225,44 +233,44 @@
         const filtered = allProducts.filter(p => (currentCategory === "all" || p.category === currentCategory) && p.name.toLowerCase().includes(search));
 
         filtered.forEach(p => {
-            if(!productQuantities[p.id]) productQuantities[p.id] = 1;
-            const mult = productQuantities[p.id];
-            const isOut = p.status === 'out' || (p.stockKg !== undefined && p.stockKg <= 0);
-            const isSoon = p.status === 'coming';
-
-            let badge = '', disabled = '', btnText = 'Add to Cart 🛒';
-            if(isOut) { badge = `<span class="badge-status">Out of Stock</span>`; disabled = 'disabled'; btnText = 'Out of Stock'; }
-            else if(isSoon) { badge = `<span class="badge-status badge-coming">Coming Soon</span>`; disabled = 'disabled'; btnText = 'Coming Soon'; }
+            const minQty = Number(p.minQty) || 1;
+            if(!productQuantities[p.id]) productQuantities[p.id] = minQty;
+            
+            const currentQty = productQuantities[p.id];
+            const unitLabel = p.unitType === 'kg' ? 'kg' : 'pc';
+            const totalPrice = (p.price * currentQty).toFixed(2);
 
             grid.innerHTML += `
                 <div class="product-card">
-                    ${badge}
                     <img src="${p.img}" class="product-img">
                     <div class="product-name">${p.name}</div>
-                    <div class="product-unit">Stock: ${p.stockKg || 0} kg</div>
-                    <div class="price-text">₹${p.price * mult}</div>
+                    <div class="product-unit">Min: ${minQty} ${unitLabel}</div>
+                    <div class="price-text">₹${totalPrice}</div>
                     <div class="counter-row">
-                        <button class="btn-step" onclick="changeQty('${p.id}', -1)">-</button>
-                        <span>${mult} kg/pc</span>
-                        <button class="btn-step" onclick="changeQty('${p.id}', 1)">+</button>
+                        <button class="btn-step" onclick="changeQty('${p.id}', -${minQty})">-</button>
+                        <span style="font-size:12px; font-weight:bold;">${currentQty.toFixed(3).replace(/\.?0+$/, '')} ${unitLabel}</span>
+                        <button class="btn-step" onclick="changeQty('${p.id}', ${minQty})">+</button>
                     </div>
-                    <button class="add-cart-btn" ${disabled} onclick="addToCart('${p.id}')">${btnText}</button>
+                    <button class="add-cart-btn" onclick="addToCart('${p.id}')">Add to Cart 🛒</button>
                 </div>
             `;
         });
     }
 
-    function changeQty(id, d) {
-        if((productQuantities[id] || 1) + d >= 1) {
-            productQuantities[id] += d;
+    function changeQty(id, step) {
+        const prod = allProducts.find(p => p.id === id);
+        const minQty = Number(prod.minQty) || 1;
+        let newQty = (productQuantities[id] || minQty) + step;
+        if(newQty >= minQty) {
+            productQuantities[id] = Math.round(newQty * 1000) / 1000;
             renderProducts();
         }
     }
 
     function addToCart(id) {
         const prod = allProducts.find(p => p.id === id);
-        const mult = productQuantities[id] || 1;
-        cart.push({ id: prod.id, name: prod.name, price: prod.price * mult, qty: mult, img: prod.img });
+        const qty = productQuantities[id] || Number(prod.minQty);
+        cart.push({ id: prod.id, name: prod.name, price: prod.price * qty, qty: qty, unit: prod.unitType });
         document.getElementById("cartCount").innerText = cart.length;
         alert(`${prod.name} കാർട്ടിൽ ചേർത്തു!`);
     }
@@ -272,34 +280,6 @@
         document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
         el.classList.add('active');
         document.getElementById(tab + 'View').classList.add('active-view');
-        if(tab === 'cart') renderCartUI();
-    }
-
-    function renderCartUI() {
-        const l = document.getElementById("cartList");
-        if(cart.length === 0) { l.innerHTML = "കാർട്ട് ശൂന്യമാണ്!"; document.getElementById("cartSummary").style.display = "none"; return; }
-        let total = 0;
-        l.innerHTML = cart.map(i => {
-            total += i.price;
-            return `<div class="cart-item"><img src="${i.img}" style="width:40px;height:40px;border-radius:8px;"><div><strong>${i.name}</strong><br>Qty: ${i.qty}</div><div>₹${i.price}</div></div>`;
-        }).join('');
-        document.getElementById("cartTotal").innerText = `₹${total}`;
-        document.getElementById("cartSummary").style.display = "block";
-    }
-
-    async function checkout() {
-        let total = cart.reduce((acc, item) => acc + item.price, 0);
-        await db.collection("orders").add({
-            userPhone: currentUserPhone,
-            items: cart,
-            totalAmount: total,
-            status: 'Pending',
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        alert("ഓർഡർ സമർപ്പിച്ചു! 🚀");
-        cart = [];
-        document.getElementById("cartCount").innerText = 0;
-        switchTab('home', document.querySelectorAll('.nav-item')[0]);
     }
 
     function filterCat(cat) { currentCategory = cat; renderProducts(); }
