@@ -3,102 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fresh Pick - Admin Panel</title>
+    <title>Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
-        body { background: #f8fafc; color: #0f172a; padding: 20px; }
-        .container { max-width: 800px; margin: auto; }
-        .card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 25px; border: 1px solid #e2e8f0; }
-        h2 { margin-bottom: 15px; color: #10b981; }
-        h3 { font-size: 16px; margin-bottom: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
-        .form-group { margin-bottom: 12px; }
-        label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #64748b; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 10px; outline: none; font-size: 14px; }
-        button { background: #10b981; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 14px; }
+        body { background: #f8fafc; color: #0f172a; padding: 15px; }
+        .admin-nav { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: #e2e8f0; border-radius: 12px; font-weight: bold; cursor: pointer; text-align: center; }
+        .tab-btn.active { background: #10b981; color: white; }
+
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+
+        .card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        h3 { margin-bottom: 12px; font-size: 16px; color: #10b981; }
+        input, select, button { width: 100%; padding: 10px; margin: 6px 0; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; }
+        button { background: #10b981; color: white; border: none; font-weight: bold; cursor: pointer; }
+
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border-bottom: 1px solid #e2e8f0; padding: 10px; text-align: left; font-size: 13px; }
-        th { color: #64748b; }
+        th, td { border-bottom: 1px solid #e2e8f0; padding: 8px; text-align: left; font-size: 12px; }
+        th { color: #64748b; background: #f1f5f9; }
+        .badge-pending { background: #f59e0b; color: white; padding: 3px 6px; border-radius: 4px; }
+        .badge-delivered { background: #10b981; color: white; padding: 3px 6px; border-radius: 4px; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-<div class="container">
-    <h2>Fresh Pick - Admin Control Panel</h2>
+<h2>ADMIN CONTROL CENTER 🛠️</h2>
+<br>
 
-    <!-- Add Category -->
+<div class="admin-nav">
+    <button class="tab-btn active" onclick="showTab('prodTab', this)">🛒 Products</button>
+    <button class="tab-btn" onclick="showTab('stockTab', this)">📦 Stock Management</button>
+    <button class="tab-btn" onclick="showTab('ordersTab', this)">📋 Orders & Rewards</button>
+</div>
+
+<!-- SECTION 1: PRODUCTS & CATEGORIES -->
+<div id="prodTab" class="admin-section active">
     <div class="card">
-        <h3>1. Add Category with Logo</h3>
-        <div class="form-group">
-            <label>Category Name (eg: Fruits)</label>
-            <input type="text" id="catName" placeholder="Category Name">
-        </div>
-        <div class="form-group">
-            <label>Logo PNG URL</label>
-            <input type="text" id="catLogo" placeholder="https://cdn-icons-png.flaticon.com/...">
-        </div>
-        <button onclick="addCategory()">Add Category</button>
+        <h3>Add Category (Select Image from Gallery)</h3>
+        <input type="text" id="catName" placeholder="Category Name (eg: Fruits)">
+        <label style="font-size: 11px; color:#666;">Choose Category Logo Photo:</label>
+        <input type="file" id="catImageFile" accept="image/*">
+        <button onclick="addCategory()">Save Category</button>
     </div>
 
-    <!-- Add Product & Stock -->
     <div class="card">
-        <h3>2. Add Product & Initial Stock</h3>
-        <div class="form-group">
-            <label>Product Name</label>
-            <input type="text" id="pName" placeholder="eg: Tomato">
-        </div>
-        <div class="form-group">
-            <label>Category</label>
-            <select id="pCat"></select>
-        </div>
-        <div class="form-group">
-            <label>Base Unit</label>
-            <select id="pUnit">
-                <option value="1kg">1 kg</option>
-                <option value="500g">500 g</option>
-                <option value="250g">250 g</option>
-                <option value="100g">100 g</option>
-                <option value="1pc">1 Pc</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Price (₹)</label>
-            <input type="number" id="pPrice" placeholder="Price">
-        </div>
-        <div class="form-group">
-            <label>Total Stock (in kg or Quantity)</label>
-            <input type="number" id="pStock" placeholder="eg: 50">
-        </div>
-        <div class="form-group">
-            <label>Product Image URL</label>
-            <input type="text" id="pImg" placeholder="Image URL">
-        </div>
-        <div class="form-group">
-            <label>Status</label>
-            <select id="pStatus">
-                <option value="available">Available (In Stock)</option>
-                <option value="out">Out of Stock</option>
-                <option value="coming">Coming Soon</option>
-            </select>
-        </div>
-        <button onclick="addProduct()">Save Product</button>
+        <h3>Add Product (Select Image from Gallery)</h3>
+        <input type="text" id="pName" placeholder="Product Name">
+        <select id="pCat"></select>
+        <input type="number" id="pPrice" placeholder="Price (₹)">
+        <input type="number" id="pStock" placeholder="Total Stock (Kg/Qty)">
+        <label style="font-size: 11px; color:#666;">Choose Product Photo:</label>
+        <input type="file" id="prodImageFile" accept="image/*">
+        <select id="pStatus">
+            <option value="available">Available</option>
+            <option value="out">Out of Stock</option>
+            <option value="coming">Coming Soon</option>
+        </select>
+        <button onclick="addProduct()">Add Product</button>
     </div>
+</div>
 
-    <!-- Stock Management Table -->
+<!-- SECTION 2: CATEGORY-WISE STOCK MANAGEMENT -->
+<div id="stockTab" class="admin-section">
     <div class="card">
-        <h3>3. Product Stock & Status Control</h3>
+        <h3>Filter & Manage Category Stock</h3>
+        <label>Select Category to View Items:</label>
+        <select id="stockFilterCat" onchange="renderStockTable()">
+            <option value="all">All Categories</option>
+        </select>
+
         <table>
             <thead>
                 <tr>
                     <th>Product</th>
-                    <th>Stock (Kg/Qty)</th>
+                    <th>Category</th>
+                    <th>Stock (Kg)</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="stockTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- SECTION 3: ORDERS & POINTS REWARDS PAGE -->
+<div id="ordersTab" class="admin-section">
+    <div class="card">
+        <h3>Manage Customer Rewards / Gifts</h3>
+        <input type="text" id="giftName" placeholder="Gift Name (eg: Watch)">
+        <input type="number" id="giftPoints" placeholder="Required Points">
+        <button onclick="addGift()">Add Gift Offer</button>
+    </div>
+
+    <div class="card">
+        <h3>Received Orders List</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>User Points</th>
+                    <th>Order Total</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="adminProdTable"></tbody>
+            <tbody id="ordersTableBody"></tbody>
         </table>
     </div>
 </div>
@@ -116,66 +129,112 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Load Dynamic Categories into Dropdown
+    let categories = [], products = [], usersData = {};
+
+    function showTab(tabId, btn) {
+        document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    // Convert Local File to Base64 String (Gallery Image Reader)
+    function getBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    // Dynamic Category Load
     db.collection("categories").onSnapshot(snap => {
-        const select = document.getElementById("pCat");
-        select.innerHTML = "";
+        categories = [];
+        const pCatSelect = document.getElementById("pCat");
+        const filterSelect = document.getElementById("stockFilterCat");
+        pCatSelect.innerHTML = "";
+        filterSelect.innerHTML = `<option value="all">All Categories</option>`;
+        
         snap.forEach(doc => {
-            select.innerHTML += `<option value="${doc.data().name}">${doc.data().name}</option>`;
+            const data = doc.data();
+            categories.push({ id: doc.id, ...data });
+            pCatSelect.innerHTML += `<option value="${data.name}">${data.name}</option>`;
+            filterSelect.innerHTML += `<option value="${data.name}">${data.name}</option>`;
         });
     });
 
-    // Load Products Table
+    // Load Products
     db.collection("products").onSnapshot(snap => {
-        const table = document.getElementById("adminProdTable");
-        table.innerHTML = "";
-        snap.forEach(doc => {
-            const p = doc.data();
-            table.innerHTML += `
-                <tr>
-                    <td><strong>${p.name}</strong></td>
-                    <td><input type="number" value="${p.stockKg || 0}" style="width:70px;" onchange="updateStock('${doc.id}', this.value)"></td>
-                    <td>
-                        <select onchange="updateStatus('${doc.id}', this.value)" style="padding:4px;">
-                            <option value="available" ${p.status==='available'?'selected':''}>Available</option>
-                            <option value="out" ${p.status==='out'?'selected':''}>Out of Stock</option>
-                            <option value="coming" ${p.status==='coming'?'selected':''}>Coming Soon</option>
-                        </select>
-                    </td>
-                    <td><button style="background:#ef4444; padding:6px 10px; width:auto;" onclick="deleteProd('${doc.id}')">Delete</button></td>
-                </tr>
-            `;
-        });
+        products = [];
+        snap.forEach(doc => products.push({ id: doc.id, ...doc.data() }));
+        renderStockTable();
+    });
+
+    // Load Users for Points Tracking
+    db.collection("users").onSnapshot(snap => {
+        usersData = {};
+        snap.forEach(doc => usersData[doc.id] = doc.data());
+        renderOrdersTable();
     });
 
     async function addCategory() {
         const name = document.getElementById("catName").value.trim();
-        const logo = document.getElementById("catLogo").value.trim();
-        if(name && logo) {
+        const fileInput = document.getElementById("catImageFile");
+        if(name && fileInput.files[0]) {
+            const logo = await getBase64(fileInput.files[0]);
             await db.collection("categories").add({ name, logo });
             alert("Category Added!");
             document.getElementById("catName").value = "";
-            document.getElementById("catLogo").value = "";
+        } else {
+            alert("പേരും ഫോട്ടോയും തിരഞ്ഞെടുക്കുക!");
         }
     }
 
     async function addProduct() {
         const name = document.getElementById("pName").value.trim();
         const category = document.getElementById("pCat").value;
-        const minUnit = document.getElementById("pUnit").value;
         const price = Number(document.getElementById("pPrice").value);
         const stockKg = Number(document.getElementById("pStock").value);
-        const img = document.getElementById("pImg").value.trim();
         const status = document.getElementById("pStatus").value;
+        const fileInput = document.getElementById("prodImageFile");
 
-        if(name && price) {
-            await db.collection("products").add({ name, category, minUnit, price, stockKg, img, status });
-            alert("Product Added!");
+        if(name && fileInput.files[0]) {
+            const img = await getBase64(fileInput.files[0]);
+            await db.collection("products").add({ name, category, price, stockKg, img, status });
+            alert("Product Saved!");
+        } else {
+            alert("പ്രോഡക്റ്റ് ഫോട്ടോയും വിവരങ്ങളും നൽകുക!");
         }
     }
 
+    function renderStockTable() {
+        const tbody = document.getElementById("stockTableBody");
+        const selectedCat = document.getElementById("stockFilterCat").value;
+        tbody.innerHTML = "";
+
+        const list = products.filter(p => selectedCat === 'all' || p.category === selectedCat);
+
+        list.forEach(p => {
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>${p.name}</strong></td>
+                    <td>${p.category}</td>
+                    <td><input type="number" value="${p.stockKg||0}" style="width:70px;" onchange="updateStock('${p.id}', this.value)"></td>
+                    <td>
+                        <select onchange="updateStatus('${p.id}', this.value)">
+                            <option value="available" ${p.status==='available'?'selected':''}>Available</option>
+                            <option value="out" ${p.status==='out'?'selected':''}>Out of Stock</option>
+                            <option value="coming" ${p.status==='coming'?'selected':''}>Coming Soon</option>
+                        </select>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
     function updateStock(id, newStock) {
-        db.collection("products").doc(id).update({ 
+        db.collection("products").doc(id).update({
             stockKg: Number(newStock),
             status: Number(newStock) <= 0 ? 'out' : 'available'
         });
@@ -185,9 +244,54 @@
         db.collection("products").doc(id).update({ status: newStatus });
     }
 
-    function deleteProd(id) {
-        if(confirm("Delete this product?")) {
-            db.collection("products").doc(id).delete();
+    // Load Received Orders
+    function renderOrdersTable() {
+        db.collection("orders").orderBy("createdAt", "desc").onSnapshot(snap => {
+            const tbody = document.getElementById("ordersTableBody");
+            tbody.innerHTML = "";
+            snap.forEach(doc => {
+                const o = doc.data();
+                const u = usersData[o.userPhone] || { points: 0 };
+                const isDelivered = o.status === 'Delivered';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${o.userPhone}</strong></td>
+                        <td>🏆 ${u.points || 0} Pts</td>
+                        <td>₹${o.totalAmount}</td>
+                        <td><span class="${isDelivered ? 'badge-delivered' : 'badge-pending'}">${o.status}</span></td>
+                        <td>
+                            ${!isDelivered ? `<button onclick="markDelivered('${doc.id}', '${o.userPhone}', ${o.totalAmount})">Mark Delivered</button>` : 'Completed'}
+                        </td>
+                    </tr>
+                `;
+            });
+        });
+    }
+
+    async function markDelivered(orderId, phone, amount) {
+        // Calculate Earned Points (eg: 1 Point for every 50 Rupees)
+        const earnedPoints = Math.floor(amount / 50) || 5;
+
+        await db.collection("orders").doc(orderId).update({ status: 'Delivered' });
+
+        const uRef = db.collection("users").doc(phone);
+        const uDoc = await uRef.get();
+        if(uDoc.exists()) {
+            const currentPts = uDoc.data().points || 0;
+            await uRef.update({ points: currentPts + earnedPoints });
+        }
+        alert(`Order Delivered! Added +${earnedPoints} Points to customer.`);
+    }
+
+    async function addGift() {
+        const giftName = document.getElementById("giftName").value.trim();
+        const requiredPoints = Number(document.getElementById("giftPoints").value);
+        if(giftName && requiredPoints) {
+            await db.collection("rewards").add({ giftName, requiredPoints });
+            alert("Gift Offer Added!");
+            document.getElementById("giftName").value = "";
+            document.getElementById("giftPoints").value = "";
         }
     }
 </script>
