@@ -14,7 +14,6 @@
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .points-pill { background: #fff; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 13px; color: #f59e0b; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
 
-        /* Banner Slider */
         .slider-container { padding: 10px 20px 0; overflow: hidden; position: relative; }
         .slider-wrapper { display: flex; transition: transform 0.5s ease-in-out; border-radius: 16px; }
         .slide-img { width: 100%; flex-shrink: 0; height: 140px; object-fit: cover; border-radius: 16px; }
@@ -37,15 +36,20 @@
         .product-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
         .product-unit { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
 
+        .badge-status { position: absolute; top: 20px; left: 20px; background: rgba(239, 68, 68, 0.95); color: white; font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: bold; }
+        .badge-coming { background: rgba(245, 158, 11, 0.95); }
+
         .counter-row { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 6px; border-radius: 12px; margin-top: 8px; }
         .btn-step { background: white; border: 1px solid #cbd5e1; width: 28px; height: 28px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .price-text { font-size: 15px; font-weight: 700; color: var(--primary); }
         .add-cart-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 12px; margin-top: 8px; cursor: pointer; }
+        .add-cart-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
 
         .page-view { display: none; padding: 20px; }
         .page-view.active-view { display: block; }
+        .cart-item { background: white; padding: 14px; border-radius: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-around: space-around; padding: 12px 0; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 99; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 99; }
         .nav-item { text-align: center; font-size: 11px; color: var(--text-muted); font-weight: 600; cursor: pointer; position: relative; }
         .nav-item.active { color: var(--primary); }
         .cart-badge { position: absolute; top: -5px; right: 5px; background: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold; }
@@ -77,7 +81,6 @@
         </div>
     </div>
 
-    <!-- Auto-Sliding Ads Section -->
     <div class="slider-container" id="sliderContainer" style="display:none;">
         <div class="slider-wrapper" id="sliderWrapper"></div>
     </div>
@@ -97,7 +100,13 @@
 <div id="cartView" class="page-view">
     <h2>കാർട്ട് 🛒</h2>
     <div id="cartList" style="margin-top:15px;">കാർട്ട് ശൂന്യമാണ്!</div>
-    <button onclick="checkout()" class="add-cart-btn" style="padding:15px; margin-top:20px; font-size:15px;">Order Now</button>
+    <div id="cartSummary" style="display:none; background:white; padding:20px; border-radius:20px; margin-top:20px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 10px;">
+            <span>ആകെ തുക:</span>
+            <strong style="color:var(--primary); font-size: 18px;" id="cartTotal">₹0</strong>
+        </div>
+        <button class="add-cart-btn" onclick="checkout()" style="padding:14px; font-size:15px;">Order Now</button>
+    </div>
 </div>
 
 <div id="profileView" class="page-view">
@@ -107,6 +116,10 @@
         <p id="profilePhone" style="color:var(--text-muted);">Phone</p>
         <div style="margin-top:15px; background:var(--primary-light); padding:15px; border-radius:12px; color:var(--primary); font-weight:bold;">
             🏆 പോയിന്റുകൾ: <span id="profilePoints">0</span>
+        </div>
+        <div style="margin-top:20px; text-align:left;">
+            <h4>🎁 Available Rewards</h4>
+            <div id="giftList" style="margin-top:10px; font-size:13px; color:#555;">ലഭ്യമായ ഗിഫ്റ്റുകൾ ഇവിടെ കാണാം...</div>
         </div>
         <button onclick="logout()" style="background:#ef4444; color:white; border:none; padding:10px 20px; border-radius:10px; font-weight:bold; margin-top:20px; cursor:pointer;">Logout</button>
     </div>
@@ -141,25 +154,22 @@
             loadUserData();
         }
         loadRunningAds();
+        loadGifts();
     }
 
-    // Auto-sliding Banner Ads Loader
     function loadRunningAds() {
         const now = Date.now();
         db.collection("ads").onSnapshot(snap => {
             const wrapper = document.getElementById("sliderWrapper");
             wrapper.innerHTML = "";
             let count = 0;
-
             snap.forEach(doc => {
                 const ad = doc.data();
-                // Check if Ad timer is still valid
                 if (ad.expiryTime > now) {
                     wrapper.innerHTML += `<img src="${ad.image}" class="slide-img">`;
                     count++;
                 }
             });
-
             if(count > 0) {
                 document.getElementById("sliderContainer").style.display = "block";
                 startAutoSlide(count);
@@ -173,7 +183,7 @@
         setInterval(() => {
             slideIndex = (slideIndex + 1) % totalSlides;
             document.getElementById("sliderWrapper").style.transform = `translateX(-${slideIndex * 100}%)`;
-        }, 3000); // 3 seconds per slide
+        }, 3000);
     }
 
     async function loginUser() {
@@ -199,6 +209,17 @@
                 document.getElementById("profileName").innerText = d.name;
                 document.getElementById("profilePhone").innerText = d.phone;
             }
+        });
+    }
+
+    function loadGifts() {
+        db.collection("rewards").onSnapshot(snap => {
+            const list = document.getElementById("giftList");
+            list.innerHTML = "";
+            snap.forEach(doc => {
+                const g = doc.data();
+                list.innerHTML += `<div style="background:#f1f5f9; padding:8px; border-radius:8px; margin-bottom:5px;"><strong>${g.giftName}</strong> - ${g.requiredPoints} Points</div>`;
+            });
         });
     }
 
@@ -240,18 +261,26 @@
             const unitLabel = p.unitType === 'kg' ? 'kg' : 'pc';
             const totalPrice = (p.price * currentQty).toFixed(2);
 
+            const isOut = p.status === 'out' || (p.stockKg !== undefined && p.stockKg <= 0);
+            const isSoon = p.status === 'coming';
+
+            let badge = '', disabled = '', btnText = 'Add to Cart 🛒';
+            if(isOut) { badge = `<span class="badge-status">Out of Stock</span>`; disabled = 'disabled'; btnText = 'Out of Stock'; }
+            else if(isSoon) { badge = `<span class="badge-status badge-coming">Coming Soon</span>`; disabled = 'disabled'; btnText = 'Coming Soon'; }
+
             grid.innerHTML += `
                 <div class="product-card">
+                    ${badge}
                     <img src="${p.img}" class="product-img">
                     <div class="product-name">${p.name}</div>
-                    <div class="product-unit">Min: ${minQty} ${unitLabel}</div>
+                    <div class="product-unit">Stock: ${p.stockKg || 0} ${unitLabel}</div>
                     <div class="price-text">₹${totalPrice}</div>
                     <div class="counter-row">
                         <button class="btn-step" onclick="changeQty('${p.id}', -${minQty})">-</button>
                         <span style="font-size:12px; font-weight:bold;">${currentQty.toFixed(3).replace(/\.?0+$/, '')} ${unitLabel}</span>
                         <button class="btn-step" onclick="changeQty('${p.id}', ${minQty})">+</button>
                     </div>
-                    <button class="add-cart-btn" onclick="addToCart('${p.id}')">Add to Cart 🛒</button>
+                    <button class="add-cart-btn" ${disabled} onclick="addToCart('${p.id}')">${btnText}</button>
                 </div>
             `;
         });
@@ -270,7 +299,7 @@
     function addToCart(id) {
         const prod = allProducts.find(p => p.id === id);
         const qty = productQuantities[id] || Number(prod.minQty);
-        cart.push({ id: prod.id, name: prod.name, price: prod.price * qty, qty: qty, unit: prod.unitType });
+        cart.push({ id: prod.id, name: prod.name, price: prod.price * qty, qty: qty, unit: prod.unitType, img: prod.img });
         document.getElementById("cartCount").innerText = cart.length;
         alert(`${prod.name} കാർട്ടിൽ ചേർത്തു!`);
     }
@@ -280,6 +309,34 @@
         document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
         el.classList.add('active');
         document.getElementById(tab + 'View').classList.add('active-view');
+        if(tab === 'cart') renderCartUI();
+    }
+
+    function renderCartUI() {
+        const l = document.getElementById("cartList");
+        if(cart.length === 0) { l.innerHTML = "കാർട്ട് ശൂന്യമാണ്!"; document.getElementById("cartSummary").style.display = "none"; return; }
+        let total = 0;
+        l.innerHTML = cart.map(i => {
+            total += i.price;
+            return `<div class="cart-item"><img src="${i.img}" style="width:40px;height:40px;border-radius:8px;"><div><strong>${i.name}</strong><br>Qty: ${i.qty} ${i.unit}</div><div>₹${i.price.toFixed(2)}</div></div>`;
+        }).join('');
+        document.getElementById("cartTotal").innerText = `₹${total.toFixed(2)}`;
+        document.getElementById("cartSummary").style.display = "block";
+    }
+
+    async function checkout() {
+        let total = cart.reduce((acc, item) => acc + item.price, 0);
+        await db.collection("orders").add({
+            userPhone: currentUserPhone,
+            items: cart,
+            totalAmount: total,
+            status: 'Pending',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert("ഓർഡർ സമർപ്പിച്ചു! 🚀");
+        cart = [];
+        document.getElementById("cartCount").innerText = 0;
+        switchTab('home', document.querySelectorAll('.nav-item')[0]);
     }
 
     function filterCat(cat) { currentCategory = cat; renderProducts(); }
