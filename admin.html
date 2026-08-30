@@ -8,8 +8,8 @@
     <style>
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
         body { background: #f8fafc; color: #0f172a; padding: 15px; }
-        .admin-nav { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: #e2e8f0; border-radius: 12px; font-weight: bold; cursor: pointer; text-align: center; }
+        .admin-nav { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: #e2e8f0; border-radius: 12px; font-weight: bold; cursor: pointer; white-space: nowrap; }
         .tab-btn.active { background: #10b981; color: white; }
 
         .admin-section { display: none; }
@@ -19,16 +19,11 @@
         h3 { margin-bottom: 12px; font-size: 16px; color: #10b981; }
         input, select, button { width: 100%; padding: 10px; margin: 6px 0; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; }
         button { background: #10b981; color: white; border: none; font-weight: bold; cursor: pointer; }
-        
-        .btn-edit { background: #3b82f6; width: auto; padding: 6px 12px; font-size: 11px; margin-right: 5px; }
-        .btn-delete { background: #ef4444; width: auto; padding: 6px 12px; font-size: 11px; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border-bottom: 1px solid #e2e8f0; padding: 8px; text-align: left; font-size: 12px; vertical-align: middle; }
+        th, td { border-bottom: 1px solid #e2e8f0; padding: 8px; text-align: left; font-size: 12px; }
         th { color: #64748b; background: #f1f5f9; }
-        .cat-logo-img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
-        .badge-pending { background: #f59e0b; color: white; padding: 3px 6px; border-radius: 4px; }
-        .badge-delivered { background: #10b981; color: white; padding: 3px 6px; border-radius: 4px; }
+        .btn-delete { background: #ef4444; width: auto; padding: 6px 12px; font-size: 11px; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -39,102 +34,82 @@
 <br>
 
 <div class="admin-nav">
-    <button class="tab-btn active" onclick="showTab('catTab', this)">📁 Categories</button>
+    <button class="tab-btn active" onclick="showTab('adsTab', this)">📢 Ad Management</button>
     <button class="tab-btn" onclick="showTab('prodTab', this)">🛒 Products</button>
-    <button class="tab-btn" onclick="showTab('stockTab', this)">📦 Stock</button>
-    <button class="tab-btn" onclick="showTab('ordersTab', this)">📋 Orders & Points</button>
+    <button class="tab-btn" onclick="showTab('catTab', this)">📁 Categories</button>
+    <button class="tab-btn" onclick="showTab('ordersTab', this)">📋 Orders</button>
 </div>
 
-<!-- SECTION 1: CATEGORY MANAGEMENT -->
-<div id="catTab" class="admin-section active">
+<!-- SECTION 1: AD RUNNING PAGE MANAGEMENT -->
+<div id="adsTab" class="admin-section active">
     <div class="card">
-        <h3 id="catFormTitle">Add New Category</h3>
-        <input type="hidden" id="editCatId">
-        <input type="text" id="catName" placeholder="Category Name (eg: Fruits)">
-        <label style="font-size: 11px; color:#666;">Category Logo Image:</label>
-        <input type="file" id="catImageFile" accept="image/*">
-        <button id="saveCatBtn" onclick="saveCategory()">Save Category</button>
-        <button id="cancelCatBtn" onclick="resetCatForm()" style="background:#64748b; display:none;">Cancel Edit</button>
+        <h3>Add Running Ad (ഓഫർ പരസ്യം ചേർക്കുക)</h3>
+        <label style="font-size: 11px; color:#666;">Ad Banner Photo:</label>
+        <input type="file" id="adImageFile" accept="image/*">
+        
+        <label style="font-size: 11px; color:#666;">ആഡ് എത്ര സമയം റൺ ചെയ്യണം (Hours & Minutes):</label>
+        <div style="display:flex; gap:10px;">
+            <input type="number" id="adHours" placeholder="Hours (ഉദാ: 2)" value="0">
+            <input type="number" id="adMinutes" placeholder="Minutes (ഉദാ: 30)" value="0">
+        </div>
+        
+        <button onclick="addAd()">Publish Ad</button>
     </div>
 
     <div class="card">
-        <h3>Existing Categories (കാറ്റഗറികൾ എഡിറ്റ് / ഡിലീറ്റ് ചെയ്യാം)</h3>
+        <h3>Active Ads List</h3>
         <table>
             <thead>
                 <tr>
-                    <th>Logo</th>
-                    <th>Category Name</th>
-                    <th>Actions</th>
+                    <th>Banner</th>
+                    <th>Expires At</th>
+                    <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="catTableBody"></tbody>
+            <tbody id="adsTableBody"></tbody>
         </table>
     </div>
 </div>
 
-<!-- SECTION 2: PRODUCTS -->
+<!-- SECTION 2: PRODUCTS WITH UNIT & MIN QTY -->
 <div id="prodTab" class="admin-section">
     <div class="card">
         <h3>Add Product</h3>
         <input type="text" id="pName" placeholder="Product Name">
         <select id="pCat"></select>
-        <input type="number" id="pPrice" placeholder="Price (₹)">
-        <input type="number" id="pStock" placeholder="Total Stock (Kg/Qty)">
-        <label style="font-size: 11px; color:#666;">Choose Product Photo:</label>
-        <input type="file" id="prodImageFile" accept="image/*">
-        <select id="pStatus">
-            <option value="available">Available</option>
-            <option value="out">Out of Stock</option>
-            <option value="coming">Coming Soon</option>
+        <input type="number" id="pPrice" placeholder="Price (₹ per Unit/Kg)">
+        
+        <label style="font-size: 11px; color:#666;">യൂണിറ്റ് ടൈപ്പ് തിരഞ്ഞെടുക്കുക (Kg or Piece):</label>
+        <select id="pUnitType">
+            <option value="kg">Kilogram (Kg)</option>
+            <option value="pc">Piece (Pc)</option>
         </select>
+
+        <label style="font-size: 11px; color:#666;">തുടങ്ങേണ്ട കുറഞ്ഞ അളവ് (Minimum Qty Start):</label>
+        <input type="number" step="0.001" id="pMinQty" placeholder="ഉദാ: 0.250 (250g-ന്) അല്ലെങ്കിൽ 1 (Piece-ന്)">
+
+        <input type="number" id="pStock" placeholder="Total Stock (Kg/Qty)">
+        <label style="font-size: 11px; color:#666;">Product Photo:</label>
+        <input type="file" id="prodImageFile" accept="image/*">
         <button onclick="addProduct()">Add Product</button>
     </div>
 </div>
 
-<!-- SECTION 3: STOCK MANAGEMENT -->
-<div id="stockTab" class="admin-section">
+<!-- SECTION 3: CATEGORIES -->
+<div id="catTab" class="admin-section">
     <div class="card">
-        <h3>Filter & Manage Category Stock</h3>
-        <select id="stockFilterCat" onchange="renderStockTable()">
-            <option value="all">All Categories</option>
-        </select>
-        <table>
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Category</th>
-                    <th>Stock (Kg)</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="stockTableBody"></tbody>
-        </table>
+        <h3>Add Category</h3>
+        <input type="text" id="catName" placeholder="Category Name">
+        <input type="file" id="catImageFile" accept="image/*">
+        <button onclick="addCategory()">Save Category</button>
     </div>
 </div>
 
-<!-- SECTION 4: ORDERS & REWARDS -->
+<!-- SECTION 4: ORDERS -->
 <div id="ordersTab" class="admin-section">
     <div class="card">
-        <h3>Customer Rewards Offers</h3>
-        <input type="text" id="giftName" placeholder="Gift Name">
-        <input type="number" id="giftPoints" placeholder="Required Points">
-        <button onclick="addGift()">Add Gift</button>
-    </div>
-
-    <div class="card">
         <h3>Received Orders</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Customer</th>
-                    <th>Points</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="ordersTableBody"></tbody>
-        </table>
+        <div id="ordersList">ഓർഡറുകൾ ഇവിടെ കാണാം...</div>
     </div>
 </div>
 
@@ -149,8 +124,6 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-
-    let categories = [], products = [], usersData = {};
 
     function showTab(tabId, btn) {
         document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
@@ -168,199 +141,80 @@
         });
     }
 
-    // Load & Render Categories
-    db.collection("categories").onSnapshot(snap => {
-        categories = [];
-        const tbody = document.getElementById("catTableBody");
-        const pCatSelect = document.getElementById("pCat");
-        const filterSelect = document.getElementById("stockFilterCat");
-        
+    // --- ADS MANAGEMENT ---
+    async function addAd() {
+        const fileInput = document.getElementById("adImageFile");
+        const hrs = Number(document.getElementById("adHours").value) || 0;
+        const mins = Number(document.getElementById("adMinutes").value) || 0;
+
+        if(!fileInput.files[0]) return alert("പരസ്യത്തിന്റെ ചിത്രം തിരഞ്ഞെടുക്കുക!");
+        if(hrs === 0 && mins === 0) return alert("റണ്ണിങ് ടൈം സെറ്റ് ചെയ്യുക!");
+
+        const image = await getBase64(fileInput.files[0]);
+        const durationMs = ((hrs * 60) + mins) * 60 * 1000;
+        const expiryTime = Date.now() + durationMs;
+
+        await db.collection("ads").add({ image, expiryTime, createdAt: Date.now() });
+        alert("Ad വിജയകരമായി പബ്ലിഷ് ചെയ്തു!");
+        fileInput.value = "";
+    }
+
+    db.collection("ads").onSnapshot(snap => {
+        const tbody = document.getElementById("adsTableBody");
         tbody.innerHTML = "";
-        pCatSelect.innerHTML = "";
-        filterSelect.innerHTML = `<option value="all">All Categories</option>`;
-
         snap.forEach(doc => {
-            const data = doc.data();
-            const catObj = { id: doc.id, ...data };
-            categories.push(catObj);
-
-            pCatSelect.innerHTML += `<option value="${data.name}">${data.name}</option>`;
-            filterSelect.innerHTML += `<option value="${data.name}">${data.name}</option>`;
-
+            const ad = doc.data();
+            const expDate = new Date(ad.expiryTime).toLocaleTimeString();
             tbody.innerHTML += `
                 <tr>
-                    <td><img src="${data.logo}" class="cat-logo-img"></td>
-                    <td><strong>${data.name}</strong></td>
-                    <td>
-                        <button class="btn-edit" onclick="editCategory('${doc.id}', '${data.name}')">Edit</button>
-                        <button class="btn-delete" onclick="deleteCategory('${doc.id}')">Delete</button>
-                    </td>
+                    <td><img src="${ad.image}" style="width:60px; height:35px; border-radius:4px; object-fit:cover;"></td>
+                    <td>${expDate}</td>
+                    <td><button class="btn-delete" onclick="deleteAd('${doc.id}')">Remove</button></td>
                 </tr>
             `;
         });
     });
 
-    async function saveCategory() {
-        const name = document.getElementById("catName").value.trim();
-        const fileInput = document.getElementById("catImageFile");
-        const editId = document.getElementById("editCatId").value;
-
-        if(!name) return alert("Category പേര് നൽകുക!");
-
-        if(editId) {
-            // Edit existing Category
-            let updateData = { name: name };
-            if(fileInput.files[0]) {
-                updateData.logo = await getBase64(fileInput.files[0]);
-            }
-            await db.collection("categories").doc(editId).update(updateData);
-            alert("Category അപ്ഡേറ്റ് ചെയ്തു!");
-            resetCatForm();
-        } else {
-            // Add new Category
-            if(!fileInput.files[0]) return alert("Logo ചിത്രം നൽകുക!");
-            const logo = await getBase64(fileInput.files[0]);
-            await db.collection("categories").add({ name, logo });
-            alert("പുതിയ Category ചേർത്തു!");
-            resetCatForm();
+    async function deleteAd(id) {
+        if(confirm("ഈ ആഡ് നീക്കം ചെയ്യണമെന്നുണ്ടോ?")) {
+            await db.collection("ads").doc(id).delete();
         }
     }
 
-    function editCategory(id, currentName) {
-        document.getElementById("editCatId").value = id;
-        document.getElementById("catName").value = currentName;
-        document.getElementById("catFormTitle").innerText = "Edit Category";
-        document.getElementById("saveCatBtn").innerText = "Update Category";
-        document.getElementById("cancelCatBtn").style.display = "block";
-    }
-
-    function resetCatForm() {
-        document.getElementById("editCatId").value = "";
-        document.getElementById("catName").value = "";
-        document.getElementById("catImageFile").value = "";
-        document.getElementById("catFormTitle").innerText = "Add New Category";
-        document.getElementById("saveCatBtn").innerText = "Save Category";
-        document.getElementById("cancelCatBtn").style.display = "none";
-    }
-
-    async function deleteCategory(id) {
-        if(confirm("ഈ Category തീർച്ചയായും ഡിലീറ്റ് ചെയ്യണമെന്നുണ്ടോ?")) {
-            await db.collection("categories").doc(id).delete();
-            alert("Category നീക്കം ചെയ്തു!");
-        }
-    }
-
-    // Load Products & Manage Stock
-    db.collection("products").onSnapshot(snap => {
-        products = [];
-        snap.forEach(doc => products.push({ id: doc.id, ...doc.data() }));
-        renderStockTable();
+    // --- PRODUCT MANAGEMENT ---
+    db.collection("categories").onSnapshot(snap => {
+        const pCatSelect = document.getElementById("pCat");
+        pCatSelect.innerHTML = "";
+        snap.forEach(doc => {
+            pCatSelect.innerHTML += `<option value="${doc.data().name}">${doc.data().name}</option>`;
+        });
     });
 
     async function addProduct() {
         const name = document.getElementById("pName").value.trim();
         const category = document.getElementById("pCat").value;
         const price = Number(document.getElementById("pPrice").value);
+        const unitType = document.getElementById("pUnitType").value;
+        const minQty = Number(document.getElementById("pMinQty").value) || (unitType==='kg'? 0.25 : 1);
         const stockKg = Number(document.getElementById("pStock").value);
-        const status = document.getElementById("pStatus").value;
         const fileInput = document.getElementById("prodImageFile");
 
         if(name && fileInput.files[0]) {
             const img = await getBase64(fileInput.files[0]);
-            await db.collection("products").add({ name, category, price, stockKg, img, status });
-            alert("Product ചേർത്തു!");
+            await db.collection("products").add({ name, category, price, unitType, minQty, stockKg, img, status: 'available' });
+            alert("Product Saved!");
         } else {
-            alert("വിവരങ്ങളും ചിത്രവും പൂർണ്ണമായി നൽകുക!");
+            alert("വിവരങ്ങൾ പൂർണ്ണമായി നൽകുക!");
         }
     }
 
-    function renderStockTable() {
-        const tbody = document.getElementById("stockTableBody");
-        const selectedCat = document.getElementById("stockFilterCat").value;
-        tbody.innerHTML = "";
-
-        const list = products.filter(p => selectedCat === 'all' || p.category === selectedCat);
-
-        list.forEach(p => {
-            tbody.innerHTML += `
-                <tr>
-                    <td><strong>${p.name}</strong></td>
-                    <td>${p.category}</td>
-                    <td><input type="number" value="${p.stockKg||0}" style="width:70px;" onchange="updateStock('${p.id}', this.value)"></td>
-                    <td>
-                        <select onchange="updateStatus('${p.id}', this.value)">
-                            <option value="available" ${p.status==='available'?'selected':''}>Available</option>
-                            <option value="out" ${p.status==='out'?'selected':''}>Out of Stock</option>
-                            <option value="coming" ${p.status==='coming'?'selected':''}>Coming Soon</option>
-                        </select>
-                    </td>
-                </tr>
-            `;
-        });
-    }
-
-    function updateStock(id, newStock) {
-        db.collection("products").doc(id).update({
-            stockKg: Number(newStock),
-            status: Number(newStock) <= 0 ? 'out' : 'available'
-        });
-    }
-
-    function updateStatus(id, newStatus) {
-        db.collection("products").doc(id).update({ status: newStatus });
-    }
-
-    // Orders & Points
-    db.collection("users").onSnapshot(snap => {
-        usersData = {};
-        snap.forEach(doc => usersData[doc.id] = doc.data());
-        renderOrdersTable();
-    });
-
-    function renderOrdersTable() {
-        db.collection("orders").orderBy("createdAt", "desc").onSnapshot(snap => {
-            const tbody = document.getElementById("ordersTableBody");
-            tbody.innerHTML = "";
-            snap.forEach(doc => {
-                const o = doc.data();
-                const u = usersData[o.userPhone] || { points: 0 };
-                const isDelivered = o.status === 'Delivered';
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${o.userPhone}</strong></td>
-                        <td>🏆 ${u.points || 0} Pts</td>
-                        <td>₹${o.totalAmount}</td>
-                        <td><span class="${isDelivered ? 'badge-delivered' : 'badge-pending'}">${o.status}</span></td>
-                        <td>
-                            ${!isDelivered ? `<button onclick="markDelivered('${doc.id}', '${o.userPhone}', ${o.totalAmount})">Mark Delivered</button>` : 'Completed'}
-                        </td>
-                    </tr>
-                `;
-            });
-        });
-    }
-
-    async function markDelivered(orderId, phone, amount) {
-        const earnedPoints = Math.floor(amount / 50) || 5;
-        await db.collection("orders").doc(orderId).update({ status: 'Delivered' });
-        const uRef = db.collection("users").doc(phone);
-        const uDoc = await uRef.get();
-        if(uDoc.exists()) {
-            const currentPts = uDoc.data().points || 0;
-            await uRef.update({ points: currentPts + earnedPoints });
-        }
-        alert(`Order Delivered! Added +${earnedPoints} Points.`);
-    }
-
-    async function addGift() {
-        const giftName = document.getElementById("giftName").value.trim();
-        const requiredPoints = Number(document.getElementById("giftPoints").value);
-        if(giftName && requiredPoints) {
-            await db.collection("rewards").add({ giftName, requiredPoints });
-            alert("Gift Offer ചേർത്തു!");
-            document.getElementById("giftName").value = "";
-            document.getElementById("giftPoints").value = "";
+    async function addCategory() {
+        const name = document.getElementById("catName").value.trim();
+        const fileInput = document.getElementById("catImageFile");
+        if(name && fileInput.files[0]) {
+            const logo = await getBase64(fileInput.files[0]);
+            await db.collection("categories").add({ name, logo });
+            alert("Category Added!");
         }
     }
 </script>
