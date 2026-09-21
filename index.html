@@ -3,61 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FRESH PICK - Fresh Groceries</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>FRESH PICK - Premium Grocery App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #10b981; --primary-light: #e6f4ea; --bg: #f8fafc; --text-dark: #0f172a; --text-muted: #64748b; }
+        :root {
+            --primary: #059669;
+            --primary-dark: #047857;
+            --primary-light: #d1fae5;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.03);
+            --shadow-md: 0 10px 25px rgba(0,0,0,0.05);
+        }
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
-        body { background: var(--bg); color: var(--text-dark); padding-bottom: 90px; }
+        body { background: var(--bg); color: var(--text-main); padding-bottom: 90px; }
 
-        .app-header { background: #f1f8f5; padding: 20px 20px 10px 20px; border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; }
-        .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .points-pill { background: #fff; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 13px; color: #f59e0b; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .app-header { background: linear-gradient(135deg, #059669, #10b981); color: white; padding: 25px 20px 20px; border-bottom-left-radius: 28px; border-bottom-right-radius: 28px; box-shadow: var(--shadow-md); }
+        .top-row { display: flex; justify-content: space-between; align-items: center; }
+        .brand-title { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        .points-pill { background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 13px; color: #fef08a; }
 
-        .slider-container { padding: 10px 20px 0; overflow: hidden; position: relative; }
-        .slider-wrapper { display: flex; transition: transform 0.5s ease-in-out; border-radius: 16px; }
-        .slide-img { width: 100%; flex-shrink: 0; height: 140px; object-fit: cover; border-radius: 16px; }
+        .slider-container { padding: 15px 20px 0; overflow: hidden; position: relative; }
+        .slider-wrapper { display: flex; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 20px; }
+        .slide-img { width: 100%; flex-shrink: 0; height: 150px; object-fit: cover; border-radius: 20px; box-shadow: var(--shadow-sm); }
 
         .search-container { padding: 15px 20px 0; }
-        .search-input { width: 100%; padding: 14px 18px; border: none; background: white; border-radius: 16px; font-size: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); outline: none; }
+        .search-input { width: 100%; padding: 14px 20px; border: none; background: white; border-radius: 18px; font-size: 14px; box-shadow: var(--shadow-sm); outline: none; border: 1px solid #e2e8f0; }
 
-        .categories-grid-container { padding: 15px 20px; }
-        .categories-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
-        .cat-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; min-width: 68px; }
-        .cat-circle { width: 64px; height: 64px; border-radius: 50%; background: #ffffff; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 2px solid transparent; margin-bottom: 6px; }
-        .cat-item.active .cat-circle { border-color: var(--primary); background: var(--primary-light); }
-        .cat-circle img { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; }
-        .cat-label { font-size: 11px; font-weight: 600; color: var(--text-dark); text-align: center; }
+        .categories-container { padding: 20px; }
+        .categories-scroll { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+        .cat-card { display: flex; flex-direction: column; align-items: center; cursor: pointer; min-width: 72px; }
+        .cat-icon-bg { width: 66px; height: 66px; border-radius: 22px; background: white; display: flex; justify-content: center; align-items: center; box-shadow: var(--shadow-sm); border: 2px solid transparent; transition: all 0.2s; }
+        .cat-card.active .cat-icon-bg { border-color: var(--primary); background: var(--primary-light); transform: translateY(-2px); }
+        .cat-icon-bg img { width: 42px; height: 42px; object-fit: cover; border-radius: 14px; }
+        .cat-name { font-size: 12px; font-weight: 700; color: var(--text-main); margin-top: 6px; text-align: center; }
 
-        .section-title { padding: 0 20px; font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+        .section-title { padding: 0 20px; font-size: 17px; font-weight: 800; margin-bottom: 12px; }
         .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px; }
-        .product-card { background: white; border-radius: 20px; padding: 14px; box-shadow: 0 6px 15px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; position: relative; display: flex; flex-direction: column; justify-content: space-between; }
-        .product-img { width: 100%; height: 120px; object-fit: cover; border-radius: 14px; margin-bottom: 10px; }
-        .product-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
-        .product-unit { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+        .product-card { background: white; border-radius: 22px; padding: 14px; box-shadow: var(--shadow-sm); border: 1px solid #f1f5f9; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .product-img { width: 100%; height: 125px; object-fit: cover; border-radius: 16px; margin-bottom: 8px; }
+        .product-title { font-size: 14px; font-weight: 700; color: var(--text-main); }
+        .product-unit-info { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+        .price-tag { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
 
-        .badge-status { position: absolute; top: 20px; left: 20px; background: rgba(239, 68, 68, 0.95); color: white; font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: bold; }
-        .badge-coming { background: rgba(245, 158, 11, 0.95); }
+        .qty-control { display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; padding: 4px 8px; border-radius: 12px; margin-bottom: 8px; }
+        .qty-btn { background: white; border: none; width: 26px; height: 26px; border-radius: 8px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .qty-display { font-size: 12px; font-weight: 700; }
 
-        .counter-row { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 6px; border-radius: 12px; margin-top: 8px; }
-        .btn-step { background: white; border: 1px solid #cbd5e1; width: 28px; height: 28px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .price-text { font-size: 15px; font-weight: 700; color: var(--primary); }
-        .add-cart-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 12px; margin-top: 8px; cursor: pointer; }
-        .add-cart-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .btn-add { width: 100%; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 700; font-size: 12px; cursor: pointer; transition: background 0.2s; }
+        .btn-add:disabled { background: #cbd5e1; cursor: not-allowed; }
 
         .page-view { display: none; padding: 20px; }
-        .page-view.active-view { display: block; }
-        .cart-item { background: white; padding: 14px; border-radius: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .page-view.active { display: block; }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 99; }
-        .nav-item { text-align: center; font-size: 11px; color: var(--text-muted); font-weight: 600; cursor: pointer; position: relative; }
-        .nav-item.active { color: var(--primary); }
-        .cart-badge { position: absolute; top: -5px; right: 5px; background: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold; }
+        .badge-status { position: absolute; top: 20px; left: 20px; background: #ef4444; color: white; font-size: 10px; padding: 4px 8px; border-radius: 8px; font-weight: 700; }
 
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-card { background: white; width: 85%; max-width: 360px; padding: 25px; border-radius: 24px; text-align: center; }
-        .modal-card input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 12px; outline: none; }
-        .modal-card button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top-left-radius: 24px; border-top-right-radius: 24px; box-shadow: 0 -5px 25px rgba(0,0,0,0.05); z-index: 100; }
+        .nav-link { text-align: center; font-size: 11px; color: var(--text-muted); font-weight: 700; cursor: pointer; position: relative; }
+        .nav-link.active { color: var(--primary); }
+        .cart-badge { position: absolute; top: -6px; right: 4px; background: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: 800; }
+
+        .history-card { background: white; border-radius: 18px; padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-sm); border: 1px solid #f1f5f9; }
+        .history-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; margin-bottom: 8px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 8px; }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-body { background: white; width: 88%; max-width: 380px; padding: 28px; border-radius: 28px; text-align: center; box-shadow: var(--shadow-md); }
+        .modal-body input { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 14px; outline: none; font-size: 14px; }
+        .modal-body button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 14px; font-weight: 800; font-size: 14px; cursor: pointer; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -65,18 +79,20 @@
 <body>
 
 <div id="loginModal" class="modal">
-    <div class="modal-card">
-        <h3>FRESH PICK 🌿</h3>
-        <input type="text" id="userName" placeholder="പേര്">
+    <div class="modal-body">
+        <h2 style="color:var(--primary); margin-bottom:8px;">FRESH PICK 🌿</h2>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">ലോഗിൻ ചെയ്യാൻ പേരും നമ്പറും നൽകുക</p>
+        <input type="text" id="userName" placeholder="നിങ്ങളുടെ പേര്">
         <input type="tel" id="userPhone" placeholder="മൊബൈൽ നമ്പർ">
-        <button onclick="loginUser()">ലോഗിൻ</button>
+        <button onclick="loginUser()">ലോഗിൻ ചെയ്യുക</button>
     </div>
 </div>
 
-<div id="homeView" class="page-view active-view" style="padding:0;">
+<!-- HOME VIEW -->
+<div id="homeView" class="page-view active" style="padding:0;">
     <div class="app-header">
         <div class="top-row">
-            <div>📍 Kerala, India</div>
+            <div class="brand-title">FRESH PICK 🌿</div>
             <div class="points-pill">🏆 <span id="userPoints">0</span> Pts</div>
         </div>
     </div>
@@ -86,49 +102,55 @@
     </div>
 
     <div class="search-container">
-        <input type="text" id="searchInput" class="search-input" placeholder="Search products..." onkeyup="renderProducts()">
+        <input type="text" id="searchInput" class="search-input" placeholder="സാധനങ്ങൾ സെർച്ച് ചെയ്യുക..." onkeyup="renderProducts()">
     </div>
 
-    <div class="categories-grid-container">
+    <div class="categories-container">
         <div class="categories-scroll" id="catContainer"></div>
     </div>
 
-    <div class="section-title">Products</div>
+    <div class="section-title">ലഭ്യമായ സാധനങ്ങൾ</div>
     <div class="products-grid" id="productGrid"></div>
 </div>
 
+<!-- CART VIEW -->
 <div id="cartView" class="page-view">
-    <h2>കാർട്ട് 🛒</h2>
-    <div id="cartList" style="margin-top:15px;">കാർട്ട് ശൂന്യമാണ്!</div>
-    <div id="cartSummary" style="display:none; background:white; padding:20px; border-radius:20px; margin-top:20px;">
-        <div style="display:flex; justify-content:space-between; margin-bottom: 10px;">
+    <h2 style="margin-bottom:15px;">കാർട്ട് 🛒</h2>
+    <div id="cartList">കാർട്ട് ശൂന്യമാണ്!</div>
+    <div id="cartSummary" style="display:none; background:white; padding:20px; border-radius:20px; margin-top:20px; box-shadow:var(--shadow-sm);">
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-weight:800;">
             <span>ആകെ തുക:</span>
-            <strong style="color:var(--primary); font-size: 18px;" id="cartTotal">₹0</strong>
+            <span style="color:var(--primary); font-size:18px;" id="cartTotal">₹0</span>
         </div>
-        <button class="add-cart-btn" onclick="checkout()" style="padding:14px; font-size:15px;">Order Now</button>
+        <button class="btn-add" onclick="checkout()" style="padding:14px; font-size:15px;">Order Now</button>
     </div>
 </div>
 
+<!-- ORDER HISTORY VIEW -->
+<div id="historyView" class="page-view">
+    <h2 style="margin-bottom:15px;">ഓർഡർ & പേയ്‌മെന്റ് ഹിസ്റ്ററി 📜</h2>
+    <div id="historyList">ഓർഡറുകൾ ലോഡ് ചെയ്യുന്നു...</div>
+</div>
+
+<!-- PROFILE VIEW -->
 <div id="profileView" class="page-view">
     <h2>മൈ പ്രൊഫൈൽ 👤</h2>
-    <div style="background:white; padding:20px; border-radius:20px; text-align:center; margin-top:15px;">
-        <h3 id="profileName">User</h3>
-        <p id="profilePhone" style="color:var(--text-muted);">Phone</p>
-        <div style="margin-top:15px; background:var(--primary-light); padding:15px; border-radius:12px; color:var(--primary); font-weight:bold;">
+    <div style="background:white; padding:24px; border-radius:24px; text-align:center; margin-top:15px; box-shadow:var(--shadow-sm);">
+        <h3 id="profileName" style="font-size:18px;">User</h3>
+        <p id="profilePhone" style="color:var(--text-muted); font-size:13px; margin-top:4px;">Phone</p>
+        <div style="margin-top:20px; background:var(--primary-light); padding:16px; border-radius:16px; color:var(--primary-dark); font-weight:800;">
             🏆 പോയിന്റുകൾ: <span id="profilePoints">0</span>
         </div>
-        <div style="margin-top:20px; text-align:left;">
-            <h4>🎁 Available Rewards</h4>
-            <div id="giftList" style="margin-top:10px; font-size:13px; color:#555;">ലഭ്യമായ ഗിഫ്റ്റുകൾ ഇവിടെ കാണാം...</div>
-        </div>
-        <button onclick="logout()" style="background:#ef4444; color:white; border:none; padding:10px 20px; border-radius:10px; font-weight:bold; margin-top:20px; cursor:pointer;">Logout</button>
+        <button onclick="logout()" style="background:#ef4444; color:white; border:none; padding:12px 24px; border-radius:12px; font-weight:700; margin-top:25px; cursor:pointer;">Logout</button>
     </div>
 </div>
 
+<!-- BOTTOM NAVIGATION -->
 <div class="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('home', this)">🏠<br>Home</div>
-    <div class="nav-item" onclick="switchTab('cart', this)">🛒<br>Cart <span class="cart-badge" id="cartCount">0</span></div>
-    <div class="nav-item" onclick="switchTab('profile', this)">👤<br>Account</div>
+    <div class="nav-link active" onclick="switchTab('home', this)">🏠<br>Home</div>
+    <div class="nav-link" onclick="switchTab('cart', this)">🛒<br>Cart <span class="cart-badge" id="cartCount">0</span></div>
+    <div class="nav-link" onclick="switchTab('history', this)">📜<br>History</div>
+    <div class="nav-link" onclick="switchTab('profile', this)">👤<br>Account</div>
 </div>
 
 <script>
@@ -152,9 +174,9 @@
         if(currentUserPhone) {
             document.getElementById("loginModal").style.display = "none";
             loadUserData();
+            loadOrderHistory();
         }
         loadRunningAds();
-        loadGifts();
     }
 
     function loadRunningAds() {
@@ -189,7 +211,7 @@
     async function loginUser() {
         const name = document.getElementById("userName").value.trim();
         const phone = document.getElementById("userPhone").value.trim();
-        if(phone.length < 10) return alert("ഫോൺ നമ്പർ തെറ്റാണ്!");
+        if(phone.length < 10) return alert("സാധുവായ മൊബൈൽ നമ്പർ നൽകുക!");
 
         currentUserPhone = phone;
         localStorage.setItem("userPhone", phone);
@@ -198,6 +220,7 @@
         if(!doc.exists()) await uRef.set({ name: name || "Customer", phone: phone, points: 0 });
         document.getElementById("loginModal").style.display = "none";
         loadUserData();
+        loadOrderHistory();
     }
 
     function loadUserData() {
@@ -212,17 +235,6 @@
         });
     }
 
-    function loadGifts() {
-        db.collection("rewards").onSnapshot(snap => {
-            const list = document.getElementById("giftList");
-            list.innerHTML = "";
-            snap.forEach(doc => {
-                const g = doc.data();
-                list.innerHTML += `<div style="background:#f1f5f9; padding:8px; border-radius:8px; margin-bottom:5px;"><strong>${g.giftName}</strong> - ${g.requiredPoints} Points</div>`;
-            });
-        });
-    }
-
     function logout() { localStorage.removeItem("userPhone"); location.reload(); }
 
     db.collection("categories").onSnapshot(snap => {
@@ -233,9 +245,9 @@
 
     function renderCategories(cats) {
         document.getElementById("catContainer").innerHTML = cats.map(cat => `
-            <div class="cat-item ${currentCategory === cat.name || (currentCategory==='all'&&cat.id==='all') ? 'active':''}" onclick="filterCat('${cat.id==='all'?'all':cat.name}')">
-                <div class="cat-circle"><img src="${cat.logo}"></div>
-                <span class="cat-label">${cat.name}</span>
+            <div class="cat-card ${currentCategory === cat.name || (currentCategory==='all'&&cat.id==='all') ? 'active':''}" onclick="filterCat('${cat.id==='all'?'all':cat.name}')">
+                <div class="cat-icon-bg"><img src="${cat.logo}"></div>
+                <span class="cat-name">${cat.name}</span>
             </div>
         `).join('');
     }
@@ -258,7 +270,7 @@
             if(!productQuantities[p.id]) productQuantities[p.id] = minQty;
             
             const currentQty = productQuantities[p.id];
-            const unitLabel = p.unitType === 'kg' ? 'kg' : 'pc';
+            const unitLabel = p.unitType === 'kg' ? 'Kg' : 'Pc';
             const totalPrice = (p.price * currentQty).toFixed(2);
 
             const isOut = p.status === 'out' || (p.stockKg !== undefined && p.stockKg <= 0);
@@ -266,21 +278,21 @@
 
             let badge = '', disabled = '', btnText = 'Add to Cart 🛒';
             if(isOut) { badge = `<span class="badge-status">Out of Stock</span>`; disabled = 'disabled'; btnText = 'Out of Stock'; }
-            else if(isSoon) { badge = `<span class="badge-status badge-coming">Coming Soon</span>`; disabled = 'disabled'; btnText = 'Coming Soon'; }
+            else if(isSoon) { badge = `<span class="badge-status" style="background:#f59e0b;">Coming Soon</span>`; disabled = 'disabled'; btnText = 'Coming Soon'; }
 
             grid.innerHTML += `
                 <div class="product-card">
                     ${badge}
                     <img src="${p.img}" class="product-img">
-                    <div class="product-name">${p.name}</div>
-                    <div class="product-unit">Stock: ${p.stockKg || 0} ${unitLabel}</div>
-                    <div class="price-text">₹${totalPrice}</div>
-                    <div class="counter-row">
-                        <button class="btn-step" onclick="changeQty('${p.id}', -${minQty})">-</button>
-                        <span style="font-size:12px; font-weight:bold;">${currentQty.toFixed(3).replace(/\.?0+$/, '')} ${unitLabel}</span>
-                        <button class="btn-step" onclick="changeQty('${p.id}', ${minQty})">+</button>
+                    <div class="product-title">${p.name}</div>
+                    <div class="product-unit-info">തുടക്കം: ${minQty} ${unitLabel}</div>
+                    <div class="price-tag">₹${totalPrice}</div>
+                    <div class="qty-control">
+                        <button class="qty-btn" onclick="changeQty('${p.id}', -${minQty})">-</button>
+                        <span class="qty-display">${currentQty.toFixed(3).replace(/\.?0+$/, '')} ${unitLabel}</span>
+                        <button class="qty-btn" onclick="changeQty('${p.id}', ${minQty})">+</button>
                     </div>
-                    <button class="add-cart-btn" ${disabled} onclick="addToCart('${p.id}')">${btnText}</button>
+                    <button class="btn-add" ${disabled} onclick="addToCart('${p.id}')">${btnText}</button>
                 </div>
             `;
         });
@@ -305,11 +317,12 @@
     }
 
     function switchTab(tab, el) {
-        document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active-view'));
-        document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(v => v.classList.remove('active'));
         el.classList.add('active');
-        document.getElementById(tab + 'View').classList.add('active-view');
+        document.getElementById(tab + 'View').classList.add('active');
         if(tab === 'cart') renderCartUI();
+        if(tab === 'history') loadOrderHistory();
     }
 
     function renderCartUI() {
@@ -318,7 +331,7 @@
         let total = 0;
         l.innerHTML = cart.map(i => {
             total += i.price;
-            return `<div class="cart-item"><img src="${i.img}" style="width:40px;height:40px;border-radius:8px;"><div><strong>${i.name}</strong><br>Qty: ${i.qty} ${i.unit}</div><div>₹${i.price.toFixed(2)}</div></div>`;
+            return `<div style="background:white; padding:12px; border-radius:16px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;"><img src="${i.img}" style="width:40px;height:40px;border-radius:10px;"><div><strong>${i.name}</strong><br><small style="color:#64748b;">${i.qty} ${i.unit}</small></div><div><strong>₹${i.price.toFixed(2)}</strong></div></div>`;
         }).join('');
         document.getElementById("cartTotal").innerText = `₹${total.toFixed(2)}`;
         document.getElementById("cartSummary").style.display = "block";
@@ -331,12 +344,41 @@
             items: cart,
             totalAmount: total,
             status: 'Pending',
+            paymentStatus: 'Cash on Delivery',
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        alert("ഓർഡർ സമർപ്പിച്ചു! 🚀");
+        alert("ഓർഡർ വിജയിച്ചു! 🚀");
         cart = [];
         document.getElementById("cartCount").innerText = 0;
-        switchTab('home', document.querySelectorAll('.nav-item')[0]);
+        switchTab('history', document.querySelectorAll('.nav-link')[2]);
+    }
+
+    function loadOrderHistory() {
+        if(!currentUserPhone) return;
+        db.collection("orders").where("userPhone", "==", currentUserPhone).onSnapshot(snap => {
+            const hList = document.getElementById("historyList");
+            if(snap.empty) { hList.innerHTML = "ഓർഡറുകളൊന്നും ലഭ്യമല്ല."; return; }
+            hList.innerHTML = "";
+            snap.forEach(doc => {
+                const o = doc.data();
+                const date = o.createdAt ? new Date(o.createdAt.toDate()).toLocaleDateString() : 'Recent';
+                hList.innerHTML += `
+                    <div class="history-card">
+                        <div class="history-header">
+                            <span>തീയതി: ${date}</span>
+                            <span style="color:var(--primary);">${o.status}</span>
+                        </div>
+                        <div style="font-size:13px; margin-bottom:8px;">
+                            ${o.items.map(i => `<div>• ${i.name} (${i.qty} ${i.unit}) - ₹${i.price}</div>`).join('')}
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:14px; margin-top:8px;">
+                            <span>Total Amount:</span>
+                            <span style="color:var(--primary);">₹${o.totalAmount}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        });
     }
 
     function filterCat(cat) { currentCategory = cat; renderProducts(); }
