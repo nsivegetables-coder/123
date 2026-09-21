@@ -19,14 +19,15 @@
         .card { background: white; border-radius: 20px; padding: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; border: 1px solid #e2e8f0; }
         h3 { margin-bottom: 15px; font-size: 17px; color: #059669; font-weight: 800; }
         input, select, button { width: 100%; padding: 12px; margin: 6px 0; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 13px; outline: none; }
-        button { background: #059669; color: white; border: none; font-weight: 800; cursor: pointer; }
+        button { background: #059669; color: white; border: none; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        button:hover { opacity: 0.9; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border-bottom: 1px solid #e2e8f0; padding: 10px; text-align: left; font-size: 12px; }
+        th, td { border-bottom: 1px solid #e2e8f0; padding: 10px; text-align: left; font-size: 12px; vertical-align: middle; }
         th { color: #64748b; background: #f1f5f9; }
 
-        .btn-delete { background: #ef4444; width: auto; padding: 6px 12px; font-size: 11px; border-radius: 8px; }
-        .btn-status { width: auto; padding: 6px 12px; font-size: 11px; border-radius: 8px; background: #3b82f6; }
+        .btn-delete { background: #ef4444; width: auto; padding: 8px 14px; font-size: 11px; border-radius: 8px; color: white; font-weight: 700; }
+        .btn-status { width: auto; padding: 8px 14px; font-size: 11px; border-radius: 8px; background: #3b82f6; color: white; font-weight: 700; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -39,7 +40,7 @@
 <div class="admin-nav">
     <button class="tab-btn active" onclick="showTab('catTab', this)">📁 Categories</button>
     <button class="tab-btn" onclick="showTab('prodTab', this)">🛒 Products</button>
-    <button class="tab-btn" onclick="showTab('stockTab', this)">📦 Stock</button>
+    <button class="tab-btn" onclick="showTab('stockTab', this)">📦 Stock & Manage</button>
     <button class="tab-btn" onclick="showTab('ordersTab', this)">📋 Orders & History</button>
     <button class="tab-btn" onclick="showTab('adsTab', this)">📢 Ads</button>
 </div>
@@ -51,7 +52,7 @@
         <input type="text" id="catName" placeholder="Category Name (ഉദാ: Vegetables)">
         <label style="font-size: 11px; color:#666;">Category Photo (ഗാലറിയിൽ നിന്ന് ചേർക്കുക):</label>
         <input type="file" id="catImageFile" accept="image/*">
-        <button onclick="addCategory()">Save Category</button>
+        <button id="saveCatBtn" onclick="addCategory()">Save Category</button>
     </div>
 
     <div class="card">
@@ -89,23 +90,25 @@
         <input type="number" id="pStock" placeholder="Total Stock (Kg/Qty)">
         <label style="font-size: 11px; color:#666;">Product Photo (ഗാലറിയിൽ നിന്ന്):</label>
         <input type="file" id="prodImageFile" accept="image/*">
-        <button onclick="addProduct()">Add Product</button>
+        <button id="saveProdBtn" onclick="addProduct()">Add Product</button>
     </div>
 </div>
 
-<!-- STOCK MANAGEMENT -->
+<!-- STOCK & PRODUCT DELETE MANAGEMENT -->
 <div id="stockTab" class="admin-section">
     <div class="card">
-        <h3>Category-wise Stock Control</h3>
+        <h3>Category-wise Stock & Product Management</h3>
         <select id="stockFilterCat" onchange="renderStockTable()">
             <option value="all">All Categories</option>
         </select>
         <table>
             <thead>
                 <tr>
+                    <th>Image</th>
                     <th>Product</th>
                     <th>Stock Qty</th>
                     <th>Status</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="stockTableBody"></tbody>
@@ -165,12 +168,24 @@
         btn.classList.add('active');
     }
 
-    function getBase64(file) {
-        return new Promise((resolve, reject) => {
+    // Image Compression Helper Function (ചിത്രങ്ങൾ പെട്ടെന്ന് അപ്‌ലോഡ് ആവാനും എറർ വരാതിരിക്കാനും)
+    function compressImage(file, maxWidth = 300) {
+        return new Promise((resolve) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const scale = maxWidth / img.width;
+                    canvas.width = maxWidth;
+                    canvas.height = img.height * scale;
+                    const ctx = canvas.getContext('canvas');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                };
+            };
         });
     }
 
@@ -178,11 +193,24 @@
     async function addCategory() {
         const name = document.getElementById("catName").value.trim();
         const fileInput = document.getElementById("catImageFile");
-        if(name && fileInput.files[0]) {
-            const logo = await getBase64(fileInput.files[0]);
+        const btn = document.getElementById("saveCatBtn");
+
+        if(!name) return alert("Category Name ടൈപ്പ് ചെയ്യുക!");
+        if(!fileInput.files[0]) return alert("Category Photo തിരഞ്ഞെടുക്കുക!");
+
+        try {
+            btn.innerText = "Saving...";
+            btn.disabled = true;
+            const logo = await compressImage(fileInput.files[0], 200);
             await db.collection("categories").add({ name, logo });
-            alert("Category Saved!");
+            alert("Category വിജയകരമായി ആഡ് ചെയ്തു! 🎉");
             document.getElementById("catName").value = "";
+            fileInput.value = "";
+        } catch(err) {
+            alert("Error: " + err.message);
+        } finally {
+            btn.innerText = "Save Category";
+            btn.disabled = false;
         }
     }
 
@@ -209,10 +237,13 @@
     });
 
     async function deleteCategory(id) {
-        if(confirm("ഈ Category നീക്കം ചെയ്യണമെന്നുണ്ടോ?")) await db.collection("categories").doc(id).delete();
+        if(confirm("ഈ Category നീക്കം ചെയ്യണമെന്നുണ്ടോ?")) {
+            await db.collection("categories").doc(id).delete();
+            alert("Category ഡിലീറ്റ് ചെയ്തു!");
+        }
     }
 
-    // PRODUCTS & STOCK
+    // PRODUCTS
     async function addProduct() {
         const name = document.getElementById("pName").value.trim();
         const category = document.getElementById("pCat").value;
@@ -221,11 +252,25 @@
         const minQty = Number(document.getElementById("pMinQty").value) || (unitType==='kg'? 0.25 : 1);
         const stockKg = Number(document.getElementById("pStock").value);
         const fileInput = document.getElementById("prodImageFile");
+        const btn = document.getElementById("saveProdBtn");
 
-        if(name && fileInput.files[0]) {
-            const img = await getBase64(fileInput.files[0]);
+        if(!name || !price || !fileInput.files[0]) return alert("എല്ലാ വിവരങ്ങളും ശരിയായി നൽകുക!");
+
+        try {
+            btn.innerText = "Adding...";
+            btn.disabled = true;
+            const img = await compressImage(fileInput.files[0], 400);
             await db.collection("products").add({ name, category, price, unitType, minQty, stockKg, img, status: 'available' });
-            alert("Product Saved!");
+            alert("Product വിജയകരമായി ആഡ് ചെയ്തു! 🛒");
+            document.getElementById("pName").value = "";
+            document.getElementById("pPrice").value = "";
+            document.getElementById("pStock").value = "";
+            fileInput.value = "";
+        } catch(err) {
+            alert("Error: " + err.message);
+        } finally {
+            btn.innerText = "Add Product";
+            btn.disabled = false;
         }
     }
 
@@ -243,14 +288,17 @@
         list.forEach(p => {
             tbody.innerHTML += `
                 <tr>
-                    <td>${p.name}</td>
+                    <td><img src="${p.img}" style="width:35px;height:35px;border-radius:8px;object-fit:cover;"></td>
+                    <td><strong>${p.name}</strong><br><small style="color:#64748b;">${p.category}</small></td>
                     <td><input type="number" value="${p.stockKg||0}" style="width:70px;" onchange="updateStock('${p.id}', this.value)"></td>
                     <td>
-                        <select onchange="updateStatus('${p.id}', this.value)">
+                        <select onchange="updateStatus('${p.id}', this.value)" style="width:auto; padding:6px;">
                             <option value="available" ${p.status==='available'?'selected':''}>Available</option>
                             <option value="out" ${p.status==='out'?'selected':''}>Out of Stock</option>
+                            <option value="coming" ${p.status==='coming'?'selected':''}>Coming Soon</option>
                         </select>
                     </td>
+                    <td><button class="btn-delete" onclick="deleteProduct('${p.id}')">Delete</button></td>
                 </tr>
             `;
         });
@@ -258,6 +306,14 @@
 
     function updateStock(id, val) { db.collection("products").doc(id).update({ stockKg: Number(val) }); }
     function updateStatus(id, val) { db.collection("products").doc(id).update({ status: val }); }
+
+    // PROD DELETE OPTION
+    async function deleteProduct(id) {
+        if(confirm("ഈ പ്രോഡക്റ്റ് ആപ്പിൽ നിന്നും പൂർണ്ണമായി ഡിലീറ്റ് ചെയ്യണമെന്നുണ്ടോ?")) {
+            await db.collection("products").doc(id).delete();
+            alert("പ്രോഡക്റ്റ് ഡിലീറ്റ് ചെയ്തു!");
+        }
+    }
 
     // ORDERS
     db.collection("orders").orderBy("createdAt", "desc").onSnapshot(snap => {
@@ -293,7 +349,7 @@
         const hrs = Number(document.getElementById("adHours").value) || 0;
         const mins = Number(document.getElementById("adMinutes").value) || 0;
         if(fileInput.files[0]) {
-            const image = await getBase64(fileInput.files[0]);
+            const image = await compressImage(fileInput.files[0], 600);
             const expiryTime = Date.now() + (((hrs * 60) + mins) * 60 * 1000);
             await db.collection("ads").add({ image, expiryTime });
             alert("Ad Published!");
