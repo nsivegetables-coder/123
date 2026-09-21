@@ -28,6 +28,7 @@
 
         .btn-delete { background: #ef4444; width: auto; padding: 8px 14px; font-size: 11px; border-radius: 8px; color: white; font-weight: 700; }
         .btn-status { width: auto; padding: 8px 14px; font-size: 11px; border-radius: 8px; background: #3b82f6; color: white; font-weight: 700; }
+        .btn-danger-all { background: #dc2626; color: white; margin-top: 10px; font-size: 12px; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -101,6 +102,9 @@
         <select id="stockFilterCat" onchange="renderStockTable()">
             <option value="all">All Categories</option>
         </select>
+        
+        <button class="btn-danger-all" onclick="deleteAllProducts()">🗑️ Delete All Products (എല്ലാ പഴയ പ്രോഡക്റ്റുകളും ഒന്നായി മായ്ക്കുക)</button>
+
         <table>
             <thead>
                 <tr>
@@ -119,7 +123,7 @@
 <!-- ORDERS & PAYMENT HISTORY -->
 <div id="ordersTab" class="admin-section">
     <div class="card">
-        <h3>All Orders & Payment History (മാസങ്ങൾ / വർഷങ്ങൾ)</h3>
+        <h3>All Orders & Payment History</h3>
         <table>
             <thead>
                 <tr>
@@ -168,7 +172,6 @@
         btn.classList.add('active');
     }
 
-    // Image Compression Helper Function (ചിത്രങ്ങൾ പെട്ടെന്ന് അപ്‌ലോഡ് ആവാനും എറർ വരാതിരിക്കാനും)
     function compressImage(file, maxWidth = 300) {
         return new Promise((resolve) => {
             const reader = new FileReader();
@@ -203,7 +206,7 @@
             btn.disabled = true;
             const logo = await compressImage(fileInput.files[0], 200);
             await db.collection("categories").add({ name, logo });
-            alert("Category വിജയകരമായി ആഡ് ചെയ്തു! 🎉");
+            alert("Category ആഡ് ചെയ്തു!");
             document.getElementById("catName").value = "";
             fileInput.value = "";
         } catch(err) {
@@ -237,7 +240,7 @@
     });
 
     async function deleteCategory(id) {
-        if(confirm("ഈ Category നീക്കം ചെയ്യണമെന്നുണ്ടോ?")) {
+        if(confirm("ഈ Category നീക്കം ചെയ്യണോ?")) {
             await db.collection("categories").doc(id).delete();
             alert("Category ഡിലീറ്റ് ചെയ്തു!");
         }
@@ -261,7 +264,7 @@
             btn.disabled = true;
             const img = await compressImage(fileInput.files[0], 400);
             await db.collection("products").add({ name, category, price, unitType, minQty, stockKg, img, status: 'available' });
-            alert("Product വിജയകരമായി ആഡ് ചെയ്തു! 🛒");
+            alert("Product ആഡ് ചെയ്തു!");
             document.getElementById("pName").value = "";
             document.getElementById("pPrice").value = "";
             document.getElementById("pStock").value = "";
@@ -307,11 +310,24 @@
     function updateStock(id, val) { db.collection("products").doc(id).update({ stockKg: Number(val) }); }
     function updateStatus(id, val) { db.collection("products").doc(id).update({ status: val }); }
 
-    // PROD DELETE OPTION
+    // DELETE INDIVIDUAL PRODUCT
     async function deleteProduct(id) {
-        if(confirm("ഈ പ്രോഡക്റ്റ് ആപ്പിൽ നിന്നും പൂർണ്ണമായി ഡിലീറ്റ് ചെയ്യണമെന്നുണ്ടോ?")) {
+        if(confirm("ഈ പ്രോഡക്റ്റ് ഡിലീറ്റ് ചെയ്യണോ?")) {
             await db.collection("products").doc(id).delete();
             alert("പ്രോഡക്റ്റ് ഡിലീറ്റ് ചെയ്തു!");
+        }
+    }
+
+    // DELETE ALL PRODUCTS AT ONCE (പഴയ ഉള്ളി, തക്കാളി, കിഴങ്ങ് തുടങ്ങിയവ എല്ലാം ഒന്നായി മാറ്റാൻ)
+    async function deleteAllProducts() {
+        if(confirm("ശ്രദ്ധിക്കുക: നിലവിലുള്ള എല്ലാ പ്രോഡക്റ്റുകളും ഡാറ്റാബേസിൽ നിന്ന് പൂർണ്ണമായി മായ്ച്ചു കളയും. ഉറപ്പാണോ?")) {
+            const snapshot = await db.collection("products").get();
+            const batch = db.batch();
+            snapshot.docs.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+            await batch.commit();
+            alert("എല്ലാ പഴയ പ്രോഡക്റ്റുകളും ഡിലീറ്റ് ആക്കി കഴിഞ്ഞു! ഇനി ആദ്യം മുതൽ ആഡ് ചെയ്യാം.");
         }
     }
 
